@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ROBO Teacher - Asisten Belajar AI</title>
+    <title>ROBO Teacher SD - Asisten Belajar AI (Groq Edition)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -27,7 +27,6 @@
             touch-action: manipulation;
         }
 
-        /* Hide scrollbar but allow scrolling */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -46,7 +45,6 @@
             background: #94a3b8;
         }
 
-        /* Jika masih muncul, kita tutup dengan kotak putih mati */
         body::after {
             content: "";
             position: fixed;
@@ -105,13 +103,13 @@
         /* Card 1: Title Card */
         .title-card {
             flex: 1;
-            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             border-radius: 12px;
             padding: 12px;
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
             position: relative;
             overflow: hidden;
             min-width: 0;
@@ -203,7 +201,7 @@
         .counter-value {
             font-size: 16px;
             font-weight: 800;
-            color: #0ea5e9;
+            color: #f97316;
             font-family: 'Courier New', monospace;
             line-height: 1;
             white-space: nowrap;
@@ -219,7 +217,7 @@
 
         .counter-bar {
             height: 100%;
-            background: linear-gradient(90deg, #0ea5e9, #22d3ee);
+            background: linear-gradient(90deg, #f97316, #fb923c);
             transition: all 0.5s ease;
             border-radius: 3px;
         }
@@ -253,33 +251,41 @@
             font-weight: 600;
         }
 
-        .switching-indicator {
-            display: none;
+        .api-status {
+            display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            color: #b45309;
-            background: #fef3c7;
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid #fde68a;
+            gap: 6px;
+            font-size: 10px;
+            padding: 6px 10px;
+            border-radius: 6px;
             margin-top: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .switching-indicator.active { display: flex; }
-
-        .spinner {
-            width: 14px;
-            height: 14px;
-            border: 2px solid #b45309;
-            border-top-color: transparent;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            flex-shrink: 0;
+        .api-status.active {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .api-status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .api-status.warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .api-status:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
 
         .btn-close-sidebar {
             position: absolute;
@@ -351,7 +357,7 @@
             top: -8px;
             left: -8px;
             font-size: 16px;
-            background: #0ea5e9;
+            background: #f97316;
             width: 24px;
             height: 24px;
             border-radius: 50%;
@@ -364,10 +370,10 @@
 
         .message.user {
             align-self: flex-end;
-            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: white;
-            border: 1px solid #0ea5e9;
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+            border: 1px solid #f97316;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
         }
 
         .message.system {
@@ -378,6 +384,17 @@
             padding: 8px 16px;
             border-radius: 20px;
             border: 1px solid #fde68a;
+            max-width: 95%;
+        }
+
+        .message.error {
+            align-self: center;
+            background: #fee2e2;
+            color: #991b1b;
+            font-size: 12px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #fca5a5;
             max-width: 95%;
         }
 
@@ -405,7 +422,7 @@
         .typing span {
             width: 8px;
             height: 8px;
-            background: #0ea5e9;
+            background: #f97316;
             border-radius: 50%;
             animation: typing 1.4s infinite;
         }
@@ -487,11 +504,11 @@
         }
 
         .btn-tool:hover {
-            border-color: #0ea5e9;
-            background: #f0f9ff;
-            color: #0ea5e9;
+            border-color: #f97316;
+            background: #fff7ed;
+            color: #f97316;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
         }
 
         .btn-tool input[type="file"] {
@@ -516,8 +533,8 @@
         }
 
         .input-box:focus-within {
-            border-color: #0ea5e9;
-            box-shadow: 0 0 20px rgba(14, 165, 233, 0.15);
+            border-color: #f97316;
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.15);
         }
 
         #messageInput {
@@ -557,7 +574,7 @@
 
         .btn-icon:hover { 
             background: #f1f5f9; 
-            color: #0ea5e9;
+            color: #f97316;
         }
         
         .btn-icon.voice { color: #ef4444; }
@@ -578,7 +595,7 @@
             width: 40px;
             height: 40px;
             border: none;
-            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: white;
             border-radius: 8px;
             cursor: pointer;
@@ -587,13 +604,13 @@
             justify-content: center;
             transition: all 0.2s;
             font-size: 18px;
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
             flex-shrink: 0;
         }
 
         .btn-send:hover {
             transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
         }
 
         /* Open Chat Button */
@@ -606,8 +623,8 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            color: #0ea5e9;
-            border: 2px solid rgba(14, 165, 233, 0.4);
+            color: #f97316;
+            border: 2px solid rgba(249, 115, 22, 0.4);
             border-radius: 50%;
             cursor: pointer;
             display: none;
@@ -615,7 +632,7 @@
             justify-content: center;
             font-size: 28px;
             box-shadow: 
-                0 8px 32px rgba(14, 165, 233, 0.2),
+                0 8px 32px rgba(249, 115, 22, 0.2),
                 inset 0 0 20px rgba(255, 255, 255, 0.2);
             z-index: 99;
             transition: all 0.3s ease;
@@ -629,9 +646,9 @@
 
         .btn-open-chat:hover {
             transform: scale(1.1);
-            background: rgba(14, 165, 233, 0.15);
-            color: #0284c7;
-            border-color: rgba(14, 165, 233, 0.8);
+            background: rgba(249, 115, 22, 0.15);
+            color: #ea580c;
+            border-color: rgba(249, 115, 22, 0.8);
         }
 
         .btn-open-chat.show { display: flex; }
@@ -702,7 +719,7 @@
             cursor: pointer;
             outline: none;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230ea5e9' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23f97316' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 12px center;
             transition: all 0.2s;
@@ -711,8 +728,8 @@
         }
 
         .subject-select:hover, .subject-select:focus {
-            border-color: #0ea5e9;
-            box-shadow: 0 0 20px rgba(14, 165, 233, 0.15);
+            border-color: #f97316;
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.15);
         }
 
         .mode-toggle {
@@ -739,14 +756,14 @@
         }
 
         .mode-btn:hover { 
-            color: #0ea5e9; 
-            background: rgba(14, 165, 233, 0.1);
+            color: #f97316; 
+            background: rgba(249, 115, 22, 0.1);
         }
         
         .mode-btn.active {
-            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
         }
 
         .toolbar-actions {
@@ -757,7 +774,7 @@
 
         .btn-ask {
             padding: 10px 18px;
-            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -767,7 +784,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            box-shadow: 0 4px 20px rgba(14, 165, 233, 0.3);
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3);
             transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -776,7 +793,7 @@
 
         .btn-ask:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(14, 165, 233, 0.5);
+            box-shadow: 0 8px 30px rgba(249, 115, 22, 0.5);
         }
 
         .btn-save {
@@ -889,11 +906,11 @@
         }
 
         .tool-btn:hover, .tool-btn.active {
-            border-color: #0ea5e9;
-            background: rgba(14, 165, 233, 0.1);
-            color: #0ea5e9;
+            border-color: #f97316;
+            background: rgba(249, 115, 22, 0.1);
+            color: #f97316;
             transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(14, 165, 233, 0.2);
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.2);
         }
 
         .color-picker-wrapper {
@@ -938,10 +955,10 @@
             width: 100%;
             max-width: 600px;
             max-height: 70vh;
-            border: 3px solid #0ea5e9;
+            border: 3px solid #f97316;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 0 60px rgba(14, 165, 233, 0.5);
+            box-shadow: 0 0 60px rgba(249, 115, 22, 0.5);
         }
 
         #cameraVideo {
@@ -963,7 +980,7 @@
         .btn-camera {
             width: 70px;
             height: 70px;
-            border: 4px solid #0ea5e9;
+            border: 4px solid #f97316;
             background: #ef4444;
             border-radius: 50%;
             cursor: pointer;
@@ -980,8 +997,8 @@
         .btn-camera-cancel {
             padding: 12px 32px;
             background: transparent;
-            color: #0ea5e9;
-            border: 2px solid #0ea5e9;
+            color: #f97316;
+            border: 2px solid #f97316;
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
@@ -990,7 +1007,7 @@
         }
 
         .btn-camera-cancel:hover {
-            background: rgba(14, 165, 233, 0.2);
+            background: rgba(249, 115, 22, 0.2);
         }
 
         /* Save Modal */
@@ -1057,10 +1074,10 @@
         }
 
         .btn-save-option:hover {
-            border-color: #0ea5e9;
-            background: #f0f9ff;
+            border-color: #f97316;
+            background: #fff7ed;
             transform: translateX(8px);
-            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.15);
+            box-shadow: 0 10px 30px rgba(249, 115, 22, 0.15);
         }
 
         .btn-save-option .icon {
@@ -1092,6 +1109,86 @@
             color: #1e293b;
         }
 
+        /* API Key Modal */
+        .apikey-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            padding: 20px;
+        }
+
+        .apikey-modal.active { display: flex; }
+
+        .apikey-content {
+            background: #ffffff;
+            padding: 28px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            animation: popIn 0.3s ease;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+
+        .apikey-content h3 {
+            margin-bottom: 16px;
+            color: #1e293b;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .apikey-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .apikey-input:focus {
+            border-color: #f97316;
+            outline: none;
+        }
+
+        .apikey-help {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: #9a3412;
+            line-height: 1.6;
+        }
+
+        .btn-save-apikey {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-save-apikey:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
+        }
+
         /* Toast */
         .toast {
             position: fixed;
@@ -1104,10 +1201,10 @@
             display: none;
             align-items: center;
             gap: 12px;
-            z-index: 1001;
+            z-index: 3000;
             animation: slideIn 0.3s ease;
             border: 1px solid #e2e8f0;
-            border-left: 4px solid #0ea5e9;
+            border-left: 4px solid #f97316;
             max-width: 90vw;
             width: auto;
             min-width: 280px;
@@ -1120,457 +1217,156 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
+        /* Grade Level Indicator */
+        .grade-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        /* Subject Info Panel */
+        .subject-info {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #9a3412;
+            line-height: 1.5;
+        }
+
+        /* Vision Badge */
+        .vision-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
         /* ============================================
            RESPONSIVE DESIGN - MOBILE FIRST
            ============================================ */
 
-        /* Extra Small Devices (phones, < 480px) */
         @media (max-width: 479px) {
-            html {
-                font-size: 14px;
-            }
-
-            .chat-sidebar {
-                width: 100%;
-                min-width: 100%;
-                position: fixed;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                z-index: 200;
-            }
-
-            .chat-sidebar.closed {
-                transform: translateX(-100%);
-                margin-right: 0;
-            }
-
-            .chat-header {
-                padding: 12px;
-            }
-
-            .header-cards {
-                flex-direction: column;
-            }
-
-            .title-card {
-                padding: 10px;
-            }
-
-            .title-icon {
-                width: 36px;
-                height: 36px;
-                font-size: 20px;
-            }
-
-            .title-text h2 {
-                font-size: 13px;
-            }
-
-            .counter-card {
-                padding: 8px 10px;
-            }
-
-            .counter-value {
-                font-size: 14px;
-            }
-
-            .chat-messages {
-                padding: 12px;
-            }
-
-            .message {
-                font-size: 13px;
-                padding: 10px 12px;
-                max-width: 95%;
-            }
-
-            .chat-input-container {
-                padding: 10px;
-            }
-
-            .toolbar {
-                padding: 10px 12px;
-                gap: 10px;
-            }
-
-            .toolbar-left {
-                width: 100%;
-                gap: 8px;
-            }
-
-            .subject-select {
-                width: 100%;
-                min-width: auto;
-                font-size: 12px;
-                padding: 8px 36px 8px 12px;
-            }
-
-            .mode-toggle {
-                width: 100%;
-            }
-
-            .mode-btn {
-                flex: 1;
-                padding: 8px 12px;
-                font-size: 11px;
-                text-align: center;
-            }
-
-            .toolbar-actions {
-                width: 100%;
-                justify-content: stretch;
-            }
-
-            .btn-ask, .btn-save {
-                flex: 1;
-                justify-content: center;
-                padding: 10px 12px;
-                font-size: 12px;
-            }
-
-            .text-mode {
-                padding: 16px;
-            }
-
-            .notes-editor {
-                font-size: 15px;
-            }
-
-            .canvas-tools {
-                top: 10px;
-                left: 10px;
-                padding: 8px;
-                gap: 6px;
-                flex-direction: row;
-                flex-wrap: wrap;
-                max-width: calc(100% - 20px);
-            }
-
-            .tool-btn, .color-picker-wrapper {
-                width: 36px;
-                height: 36px;
-                font-size: 16px;
-            }
-
-            .save-options {
-                padding: 20px;
-                margin: 10px;
-            }
-
-            .save-options h3 {
-                font-size: 16px;
-            }
-
-            .btn-save-option {
-                padding: 12px 16px;
-            }
-
-            .btn-save-option .icon {
-                font-size: 24px;
-            }
-
-            .camera-container {
-                max-height: 60vh;
-            }
-
-            .btn-camera {
-                width: 60px;
-                height: 60px;
-            }
-
-            .toast {
-                left: 10px;
-                right: 10px;
-                top: 10px;
-                max-width: none;
-                min-width: auto;
-            }
+            html { font-size: 14px; }
+            .chat-sidebar { width: 100%; min-width: 100%; position: fixed; top: 0; bottom: 0; left: 0; z-index: 200; }
+            .chat-sidebar.closed { transform: translateX(-100%); margin-right: 0; }
+            .chat-header { padding: 12px; }
+            .header-cards { flex-direction: column; }
+            .title-card { padding: 10px; }
+            .title-icon { width: 36px; height: 36px; font-size: 20px; }
+            .title-text h2 { font-size: 13px; }
+            .counter-card { padding: 8px 10px; }
+            .counter-value { font-size: 14px; }
+            .chat-messages { padding: 12px; }
+            .message { font-size: 13px; padding: 10px 12px; max-width: 95%; }
+            .chat-input-container { padding: 10px; }
+            .toolbar { padding: 10px 12px; gap: 10px; }
+            .toolbar-left { width: 100%; gap: 8px; }
+            .subject-select { width: 100%; min-width: auto; font-size: 12px; padding: 8px 36px 8px 12px; }
+            .mode-toggle { width: 100%; }
+            .mode-btn { flex: 1; padding: 8px 12px; font-size: 11px; text-align: center; }
+            .toolbar-actions { width: 100%; justify-content: stretch; }
+            .btn-ask, .btn-save { flex: 1; justify-content: center; padding: 10px 12px; font-size: 12px; }
+            .text-mode { padding: 16px; }
+            .notes-editor { font-size: 15px; }
+            .canvas-tools { top: 10px; left: 10px; padding: 8px; gap: 6px; flex-direction: row; flex-wrap: wrap; max-width: calc(100% - 20px); }
+            .tool-btn, .color-picker-wrapper { width: 36px; height: 36px; font-size: 16px; }
+            .save-options, .apikey-content { padding: 20px; margin: 10px; }
+            .save-options h3, .apikey-content h3 { font-size: 16px; }
+            .btn-save-option { padding: 12px 16px; }
+            .btn-save-option .icon { font-size: 24px; }
+            .camera-container { max-height: 60vh; }
+            .btn-camera { width: 60px; height: 60px; }
+            .toast { left: 10px; right: 10px; top: 10px; max-width: none; min-width: auto; }
+            .subject-info { display: none; }
         }
 
-        /* Small Devices (phones, 480px - 767px) */
         @media (min-width: 480px) and (max-width: 767px) {
-            .chat-sidebar {
-                width: 100%;
-                min-width: 100%;
-                position: fixed;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                z-index: 200;
-            }
-
-            .chat-sidebar.closed {
-                transform: translateX(-100%);
-                margin-right: 0;
-            }
-
-            .header-cards {
-                flex-direction: row;
-            }
-
-            .toolbar {
-                padding: 12px;
-            }
-
-            .toolbar-left {
-                gap: 10px;
-            }
-
-            .subject-select {
-                min-width: 160px;
-            }
-
-            .mode-btn {
-                padding: 8px 14px;
-                font-size: 12px;
-            }
-
-            .btn-ask, .btn-save {
-                padding: 10px 16px;
-                font-size: 12px;
-            }
-
-            .canvas-tools {
-                flex-direction: row;
-            }
+            .chat-sidebar { width: 100%; min-width: 100%; position: fixed; top: 0; bottom: 0; left: 0; z-index: 200; }
+            .chat-sidebar.closed { transform: translateX(-100%); margin-right: 0; }
+            .header-cards { flex-direction: row; }
+            .toolbar { padding: 12px; }
+            .toolbar-left { gap: 10px; }
+            .subject-select { min-width: 160px; }
+            .mode-btn { padding: 8px 14px; font-size: 12px; }
+            .btn-ask, .btn-save { padding: 10px 16px; font-size: 12px; }
+            .canvas-tools { flex-direction: row; }
         }
 
-        /* Medium Devices (tablets, 768px - 1023px) */
         @media (min-width: 768px) and (max-width: 1023px) {
-            .chat-sidebar {
-                width: 320px;
-                min-width: 320px;
-            }
-
-            .chat-sidebar.closed {
-                margin-right: -320px;
-            }
-
-            .header-cards {
-                flex-direction: column;
-            }
-
-            .toolbar {
-                padding: 12px 16px;
-            }
-
-            .subject-select {
-                min-width: 180px;
-            }
-
-            .canvas-tools {
-                flex-direction: column;
-            }
+            .chat-sidebar { width: 320px; min-width: 320px; }
+            .chat-sidebar.closed { margin-right: -320px; }
+            .header-cards { flex-direction: column; }
+            .toolbar { padding: 12px 16px; }
+            .subject-select { min-width: 180px; }
+            .canvas-tools { flex-direction: column; }
         }
 
-        /* Large Devices (laptops, 1024px - 1279px) */
         @media (min-width: 1024px) and (max-width: 1279px) {
-            .chat-sidebar {
-                width: 340px;
-                min-width: 340px;
-            }
-
-            .chat-sidebar.closed {
-                margin-right: -340px;
-            }
-
-            .header-cards {
-                flex-direction: row;
-            }
-
-            .toolbar {
-                padding: 14px 20px;
-            }
+            .chat-sidebar { width: 340px; min-width: 340px; }
+            .chat-sidebar.closed { margin-right: -340px; }
+            .header-cards { flex-direction: row; }
+            .toolbar { padding: 14px 20px; }
         }
 
-        /* Extra Large Devices (desktops, 1280px+) */
         @media (min-width: 1280px) {
-            .chat-sidebar {
-                width: 380px;
-                min-width: 380px;
-            }
-
-            .chat-sidebar.closed {
-                margin-right: -380px;
-            }
-
-            .chat-header {
-                padding: 20px;
-            }
-
-            .header-cards {
-                flex-direction: row;
-                gap: 12px;
-            }
-
-            .title-card {
-                padding: 15px;
-            }
-
-            .title-icon {
-                width: 45px;
-                height: 45px;
-                font-size: 28px;
-            }
-
-            .title-text h2 {
-                font-size: 16px;
-            }
-
-            .counter-card {
-                padding: 12px 15px;
-            }
-
-            .counter-value {
-                font-size: 20px;
-            }
-
-            .chat-messages {
-                padding: 20px;
-            }
-
-            .message {
-                font-size: 14px;
-                padding: 14px 18px;
-                max-width: 85%;
-            }
-
-            .chat-input-container {
-                padding: 15px;
-            }
-
-            .toolbar {
-                padding: 15px 25px;
-            }
-
-            .subject-select {
-                padding: 12px 45px 12px 18px;
-                font-size: 14px;
-                min-width: 220px;
-            }
-
-            .mode-btn {
-                padding: 10px 24px;
-                font-size: 14px;
-            }
-
-            .btn-ask {
-                padding: 12px 28px;
-                font-size: 15px;
-            }
-
-            .btn-save {
-                padding: 12px 24px;
-                font-size: 15px;
-            }
-
-            .text-mode {
-                padding: 40px;
-            }
-
-            .notes-editor {
-                font-size: 18px;
-            }
-
-            .canvas-tools {
-                top: 20px;
-                left: 20px;
-                padding: 15px;
-            }
-
-            .tool-btn, .color-picker-wrapper {
-                width: 45px;
-                height: 45px;
-                font-size: 22px;
-            }
+            .chat-sidebar { width: 380px; min-width: 380px; }
+            .chat-sidebar.closed { margin-right: -380px; }
+            .chat-header { padding: 20px; }
+            .header-cards { flex-direction: row; gap: 12px; }
+            .title-card { padding: 15px; }
+            .title-icon { width: 45px; height: 45px; font-size: 28px; }
+            .title-text h2 { font-size: 16px; }
+            .counter-card { padding: 12px 15px; }
+            .counter-value { font-size: 20px; }
+            .chat-messages { padding: 20px; }
+            .message { font-size: 14px; padding: 14px 18px; max-width: 85%; }
+            .chat-input-container { padding: 15px; }
+            .toolbar { padding: 15px 25px; }
+            .subject-select { padding: 12px 45px 12px 18px; font-size: 14px; min-width: 220px; }
+            .mode-btn { padding: 10px 24px; font-size: 14px; }
+            .btn-ask { padding: 12px 28px; font-size: 15px; }
+            .btn-save { padding: 12px 24px; font-size: 15px; }
+            .text-mode { padding: 40px; }
+            .notes-editor { font-size: 18px; }
+            .canvas-tools { top: 20px; left: 20px; padding: 15px; }
+            .tool-btn, .color-picker-wrapper { width: 45px; height: 45px; font-size: 22px; }
         }
 
-        /* Landscape orientation for mobile */
         @media (max-height: 500px) and (orientation: landscape) {
-            .chat-header {
-                padding: 4px 8px;
-            }
-
-            .header-cards {
-                flex-direction: row;
-            }
-
-            .title-card, .counter-card {
-                padding: 4px 10px;
-            }
-
-            .title-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
-            }
-
-            .refresh-date {
-                display: none;
-            }
-
-            .chat-messages {
-                padding: 10px;
-            }
-
-            .chat-input-container {
-                padding: 8px;
-            }
-
-            .toolbar {
-                padding: 8px 12px;
-            }
-
-            .canvas-tools {
-                flex-direction: row;
-                top: 8px;
-                left: 8px;
-                padding: 6px;
-            }
+            .chat-header { padding: 4px 8px; }
+            .header-cards { flex-direction: row; }
+            .title-card, .counter-card { padding: 4px 10px; }
+            .title-icon { width: 32px; height: 32px; font-size: 14px; }
+            .refresh-date { display: none; }
+            .chat-messages { padding: 10px; }
+            .chat-input-container { padding: 8px; }
+            .toolbar { padding: 8px 12px; }
+            .canvas-tools { flex-direction: row; top: 8px; left: 8px; padding: 6px; }
+            .subject-info { display: none; }
         }
 
-        /* High DPI / Retina displays */
-        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-            .btn-tool, .tool-btn, .btn-icon, .btn-send {
-                transform: translateZ(0);
-            }
-        }
-
-        /* Print styles */
         @media print {
-            .chat-sidebar,
-            .btn-open-chat,
-            .toolbar,
-            .canvas-tools {
-                display: none !important;
-            }
-
-            .workspace {
-                width: 100% !important;
-            }
-
-            .text-mode, .canvas-mode {
-                display: block !important;
-                overflow: visible !important;
-            }
-        }
-
-        /* Dark mode support (optional) */
-        @media (prefers-color-scheme: dark) {
-            /* Can be enabled if needed */
-        }
-
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
+            .chat-sidebar, .btn-open-chat, .toolbar, .canvas-tools { display: none !important; }
+            .workspace { width: 100% !important; }
+            .text-mode, .canvas-mode { display: block !important; overflow: visible !important; }
         }
     </style>
-<base target="_blank">
 </head>
 <body>
 
@@ -1580,46 +1376,53 @@
             <div class="chat-header">
                 <button class="btn-close-sidebar" onclick="toggleChat()" title="Tutup Chat">×</button>
                 
-                <!-- 2 Card Sejajar -->
                 <div class="header-cards">
-                    <!-- Card 1: Title -->
                     <div class="title-card">
                         <div class="title-icon">🤖</div>
                         <div class="title-text">
                             <h2>ROBO Teacher</h2>
-                            <div class="subtitle">AI LEARNING v2.0</div>
+                            <div class="subtitle">SD KELAS 3-6</div>
                         </div>
                     </div>
                     
-                    <!-- Card 2: Counter -->
                     <div class="counter-card">
                         <div class="counter-header">
-                            <span class="counter-label">BULAN INI</span>
-                            <span class="counter-value" id="counterValue">0/1000</span>
+                            <span class="counter-label">PERTANYAAN</span>
+                            <span class="counter-value" id="counterValue">0</span>
                         </div>
                         <div class="counter-bar-container">
                             <div class="counter-bar" id="counterFill" style="width: 0%"></div>
                         </div>
                         <div class="counter-footer">
-                            <span id="botActive">ROBO-01</span>
-                            <span id="remainingCount">1000</span>
+                            <span id="apiProvider">GROQ</span>
+                            <span id="remainingCount">FREE TIER</span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="refresh-date" id="refreshDate">
-                    REFRESH: 01 JAN 2025
+                    API: GROQ CLOUD
                 </div>
                 
-                <div class="switching-indicator" id="switchingIndicator">
-                    <div class="spinner"></div>
-                    <span>BERALIH KE BOT...</span>
+                <div class="api-status warning" id="apiStatus" onclick="showApiKeyModal()">
+                    <span>⚠️</span>
+                    <span>Klik untuk setting API Key</span>
                 </div>
             </div>
 
             <div class="chat-messages" id="chatMessages">
                 <div class="message bot">
-                    👋 Selamat datang! Saya ROBO Teacher, asisten AI untuk belajar. Pilih mata pelajaran dan mulai bertanya!
+                    👋 Halo! Saya ROBO Teacher untuk SD Kelas 3-6.<br><br>
+                    ⚠️ <strong>Perhatian:</strong> API Key Groq belum di-set. Klik tombol kuning di atas untuk mengatur API Key.<br><br>
+                    🎯 Mata Pelajaran:<br>
+                    • PKn, Bahasa Indonesia, Matematika<br>
+                    • IPAS, SBdP, PJOK<br>
+                    • Bahasa Inggris & Daerah<br><br>
+                    <strong>Cara mendapatkan API Key Groq:</strong><br>
+                    1. Buka console.groq.com<br>
+                    2. Sign up gratis<br>
+                    3. Klik "Create API Key"<br>
+                    4. Paste di sini
                 </div>
             </div>
 
@@ -1638,37 +1441,37 @@
                 </div>
 
                 <div class="input-box">  			  
-    			<textarea id="messageInput" placeholder="Ketik pertanyaanmu..." rows="3" onkeypress="handleKeyPress(event)"></textarea>
-		</div>
-		<div class="button-card" style="
-    display: inline-flex;
-    gap: 20px;
-    padding: 5px;
-    background: linear-gradient(145deg, #f5f7fa 0%, #c3cfe2 100%);
-    border-radius: 20px;
-    box-shadow: 5px 5px 15px rgba(0,0,0,0.1), 
-                -5px -5px 15px rgba(255,255,255,0.8);
-">
-    <button class="btn-icon voice" id="voiceBtn" onclick="toggleVoice()" title="Voice Input" style="
-        background: #ffffff;
-        border: none;
-        border-radius: 12px;
-        padding: 12px;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        transition: transform 0.2s;
-    ">🎤</button>
-    <button class="btn-send" onclick="sendMessage()" title="Kirim" style="
-        background: #ffffff;
-        color: #667eea;
-        border: none;
-        border-radius: 12px;
-        padding: 12px 18px;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        transition: transform 0.2s;
-    ">➤</button>
-</div>
+                    <textarea id="messageInput" placeholder="Ketik pertanyaanmu..." rows="3" onkeypress="handleKeyPress(event)"></textarea>
+                </div>
+                <div class="button-card" style="
+                    display: inline-flex;
+                    gap: 20px;
+                    padding: 5px;
+                    background: linear-gradient(145deg, #f5f7fa 0%, #c3cfe2 100%);
+                    border-radius: 20px;
+                    box-shadow: 5px 5px 15px rgba(0,0,0,0.1), 
+                                -5px -5px 15px rgba(255,255,255,0.8);
+                ">
+                    <button class="btn-icon voice" id="voiceBtn" onclick="toggleVoice()" title="Voice Input" style="
+                        background: #ffffff;
+                        border: none;
+                        border-radius: 12px;
+                        padding: 12px;
+                        cursor: pointer;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                        transition: transform 0.2s;
+                    ">🎤</button>
+                    <button class="btn-send" onclick="sendMessage()" title="Kirim" style="
+                        background: #ffffff;
+                        color: #f97316;
+                        border: none;
+                        border-radius: 12px;
+                        padding: 12px 18px;
+                        cursor: pointer;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                        transition: transform 0.2s;
+                    ">➤</button>
+                </div>
             </div>
         </aside>
 
@@ -1683,19 +1486,55 @@
             <div class="toolbar">
                 <div class="toolbar-left">
                     <select class="subject-select" id="subjectSelect" onchange="changeSubject(this.value)">
-                        <optgroup label="📚 MATA PELAJARAN UTAMA">
-                            <option value="b-indonesia">🇮🇩 Bahasa Indonesia</option>
-                            <option value="matematika">🔢 Matematika</option>
-                            <option value="ppkn">🏛️ PPKn</option>
-                            <option value="ipas">🔬 IPAS</option>
-                            <option value="sbdp">🎨 SBdP</option>
-                            <option value="pjok">🏃 PJOK</option>
+                        <optgroup label="🏛️ PENDIDIKAN PANCASILA & KEWARGANEGARAAN">
+                            <option value="pkn-3">PKn Kelas 3 - Pancasila & UUD</option>
+                            <option value="pkn-4">PKn Kelas 4 - NKRI & Bhinneka</option>
+                            <option value="pkn-5">PKn Kelas 5 - HAM & Demokrasi</option>
+                            <option value="pkn-6">PKn Kelas 6 - Globalisasi</option>
+                        </optgroup>
+                        <optgroup label="🇮🇩 BAHASA INDONESIA">
+                            <option value="bindonesia-3">B. Indonesia Kelas 3 - Membaca & Menulis</option>
+                            <option value="bindonesia-4">B. Indonesia Kelas 4 - Puisi & Cerita</option>
+                            <option value="bindonesia-5">B. Indonesia Kelas 5 - Teks Laporan</option>
+                            <option value="bindonesia-6">B. Indonesia Kelas 6 - Resensi & Diskusi</option>
+                        </optgroup>
+                        <optgroup label="🔢 MATEMATIKA">
+                            <option value="matematika-3">Matematika Kelas 3 - Perkalian/Pembagian</option>
+                            <option value="matematika-4">Matematika Kelas 4 - Pecahan & Bangun</option>
+                            <option value="matematika-5">Matematika Kelas 5 - Operasi Campuran</option>
+                            <option value="matematika-6">Matematika Kelas 6 - Bilangan Bulat</option>
+                        </optgroup>
+                        <optgroup label="🌍 IPAS (IPA & IPS)">
+                            <option value="ipas-3">IPAS Kelas 3 - Makhluk Hidup</option>
+                            <option value="ipas-4">IPAS Kelas 4 - Energi & Gaya</option>
+                            <option value="ipas-5">IPAS Kelas 5 - Bumi & Alam Semesta</option>
+                            <option value="ipas-6">IPAS Kelas 6 - Bioteknologi</option>
+                        </optgroup>
+                        <optgroup label="🎨 SENI BUDAYA & PRAKARYA">
+                            <option value="sbdp-3">SBdP Kelas 3 - Menggambar & Melukis</option>
+                            <option value="sbdp-4">SBdP Kelas 4 - Musik & Tari</option>
+                            <option value="sbdp-5">SBdP Kelas 5 - Kerajinan</option>
+                            <option value="sbdp-6">SBdP Kelas 6 - Desain & Karya</option>
+                        </optgroup>
+                        <optgroup label="🏃 PENDIDIKAN JASMANI">
+                            <option value="pjok-3">PJOK Kelas 3 - Gerak Dasar</option>
+                            <option value="pjok-4">PJOK Kelas 4 - Permainan Bola</option>
+                            <option value="pjok-5">PJOK Kelas 5 - Atletik</option>
+                            <option value="pjok-6">PJOK Kelas 6 - Kesehatan & Kebugaran</option>
                         </optgroup>
                         <optgroup label="🌟 MATA PELAJARAN TAMBAHAN">
-                            <option value="b-inggris">🇬🇧 Bahasa Inggris</option>
-                            <option value="b-daerah">🗣️ Bahasa Daerah</option>
+                            <option value="binggris-3">Bahasa Inggris Kelas 3</option>
+                            <option value="binggris-4">Bahasa Inggris Kelas 4</option>
+                            <option value="binggris-5">Bahasa Inggris Kelas 5</option>
+                            <option value="binggris-6">Bahasa Inggris Kelas 6</option>
+                            <option value="bdaerah-3">Bahasa Daerah Kelas 3</option>
+                            <option value="bdaerah-4">Bahasa Daerah Kelas 4</option>
+                            <option value="bdaerah-5">Bahasa Daerah Kelas 5</option>
+                            <option value="bdaerah-6">Bahasa Daerah Kelas 6</option>
                         </optgroup>
                     </select>
+                    <span class="grade-indicator" id="gradeIndicator">KELAS 3</span>
+                    <span class="vision-badge" id="visionBadge" title="Vision AI Ready">👁️ VISION</span>
 
                     <div class="mode-toggle">
                         <button class="mode-btn active" onclick="switchMode('text')">📝 CATATAN</button>
@@ -1718,15 +1557,26 @@
             <div class="content-area">
                 <!-- Text Mode -->
                 <div class="text-mode active" id="textMode">
-                    <textarea class="notes-editor" id="notesEditor" placeholder="📝 Area Catatan Digital
+                    <div class="subject-info" id="subjectInfo">
+                        <strong>📚 PKn Kelas 3:</strong> Mempelajari Pancasila sebagai dasar negara, UUD 1945, dan semboyan Bhinneka Tunggal Ika.
+                    </div>
+                    <textarea class="notes-editor" id="notesEditor" placeholder="📝 Area Catatan Digital - SD Kelas 3-6
 
 💡 Tips Penggunaan:
 • Tulis catatan pelajaranmu di sini
 • Gunakan mode GAMBAR untuk menggambar rumus/diagram
 • Klik TANYAKAN untuk kirim ke ROBO Teacher
-• Semua catatan tersimpan otomatis
+• Semua catatan tersimpan otomatis di browser
 
-🎯 Siap belajar! Pilih mata pelajaran dan mulai..."></textarea>
+🎯 Mata Pelajaran:
+• PKn: Pancasila, UUD 1945, NKRI, Bhinneka Tunggal Ika
+• Bahasa Indonesia: Membaca, menulis, berbicara, menyimak
+• Matematika: Operasi hitung, pecahan, bangun, pengukuran
+• IPAS: IPA (makhluk hidup, energi) + IPS (sejarah, geografi)
+• SBdP: Seni rupa, musik, tari, kerajinan
+• PJOK: Jasmani, kesehatan, olahraga
+
+Siap belajar! 🚀"></textarea>
                 </div>
 
                 <!-- Canvas Mode -->
@@ -1735,7 +1585,7 @@
                         <button class="tool-btn active" onclick="setTool('pen')" title="Pena">✏️</button>
                         <button class="tool-btn" onclick="setTool('eraser')" title="Penghapus">🧹</button>
                         <div class="color-picker-wrapper">
-                            <input type="color" class="color-picker" id="colorPicker" value="#0ea5e9" onchange="setColor(this.value)">
+                            <input type="color" class="color-picker" id="colorPicker" value="#f97316" onchange="setColor(this.value)">
                         </div>
                         <button class="tool-btn" onclick="clearCanvas()" title="Hapus Semua">🗑️</button>
                         <button class="tool-btn" onclick="saveCanvasImage()" title="Simpan Gambar">💾</button>
@@ -1789,6 +1639,37 @@
         </div>
     </div>
 
+    <!-- API Key Modal -->
+    <div class="apikey-modal" id="apikeyModal">
+        <div class="apikey-content">
+            <h3>🔑 Setting API Key Groq</h3>
+            
+            <div class="apikey-help">
+                <strong>🚀 GROQ - Ultra Fast AI Inference</strong><br><br>
+                
+                <strong>Keuntungan Groq:</strong><br>
+                • ⚡ Kecepatan super cepat (18x lebih cepat)<br>
+                • 🆓 Free tier tersedia (500K tokens/hari)<br>
+                • 🧠 Model Llama 3.3 70B & Vision support<br>
+                • 🔒 Open source models<br><br>
+                
+                <strong>Cara mendapatkan API Key:</strong><br>
+                1. Buka <a href="https://console.groq.com" target="_blank">console.groq.com</a><br>
+                2. Sign up gratis (no credit card)<br>
+                3. Klik "Create API Key"<br>
+                4. Copy dan paste di bawah<br><br>
+                
+                <strong>Format API Key:</strong> gsk_...
+            </div>
+            
+            <input type="password" class="apikey-input" id="apiKeyInput" placeholder="Paste API Key Groq di sini (gsk_...)">
+            
+            <button class="btn-save-apikey" onclick="saveApiKey()">💾 Simpan & Test API</button>
+            
+            <button class="btn-close-modal" onclick="closeApiKeyModal()" style="margin-top: 8px;">Batal</button>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div class="toast" id="toast">
         <div style="font-size: 24px;" id="toastIcon">✅</div>
@@ -1798,62 +1679,139 @@
         </div>
     </div>
 
-    <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
-
     <script>
         // ==========================================
-        // KONFIGURASI 3 BOTPRESS BOTS
+        // KONFIGURASI API - GROQ CLOUD
         // ==========================================
-        const BOTS = [
-            { 
-                id: 'YOUR_BOT_ID_1_HERE',
-                clientId: 'YOUR_CLIENT_ID_1_HERE',
-                name: 'ROBO-01',
-                color: '#0ea5e9'
+        
+        // Default API Key (bisa diganti user via localStorage)
+        let GROQ_API_KEY = localStorage.getItem('robo_groq_api_key') || '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';
+        
+        // Model Groq yang digunakan
+        const GROQ_MODEL_TEXT = 'llama-3.3-70b-versatile';      // Untuk teks (fast & capable)
+        const GROQ_MODEL_VISION = 'meta-llama/llama-4-scout-17b-16e-instruct';  // Untuk gambar (multimodal) [^17^]
+        
+        // Base URL API Groq (OpenAI compatible)
+        const GROQ_BASE_URL = 'https://api.groq.com/openai/v1';
+
+        // ==========================================
+        // KURIKULUM SD KELAS 3-6 (MERDEKA)
+        // ==========================================
+        
+        const CURRICULUM_DATA = {
+            'pkn': {
+                name: 'Pendidikan Pancasila dan Kewarganegaraan',
+                icon: '🏛️',
+                topics: {
+                    3: 'Pancasila sebagai dasar negara, UUD 1945, Bhinneka Tunggal Ika, identitas nasional',
+                    4: 'NKRI, keberagaman suku/budaya, gotong royong, nilai luhur budaya',
+                    5: 'Hak dan kewajiban warga negara, demokrasi, keadilan, rule of law',
+                    6: 'Globalisasi, digital citizenship, konservasi, persatuan bangsa'
+                }
             },
-            { 
-                id: 'YOUR_BOT_ID_2_HERE',
-                clientId: 'YOUR_CLIENT_ID_2_HERE',
-                name: 'ROBO-02',
-                color: '#8b5cf6'
+            'bindonesia': {
+                name: 'Bahasa Indonesia',
+                icon: '🇮🇩',
+                topics: {
+                    3: 'Membaca pemahaman, menulis paragraf sederhana, puisi anak, cerita pendek',
+                    4: 'Teks narasi, puisi rakyat, dongeng, menulis surat, berbicara di depan kelas',
+                    5: 'Teks laporan hasil observasi, cerita fabel, pantun, pidato singkat',
+                    6: 'Teks eksposisi, resensi buku, diskusi, debat, menulis karya ilmiah sederhana'
+                }
             },
-            { 
-                id: 'YOUR_BOT_ID_3_HERE',
-                clientId: 'YOUR_CLIENT_ID_3_HERE',
-                name: 'ROBO-03',
-                color: '#10b981'
+            'matematika': {
+                name: 'Matematika',
+                icon: '🔢',
+                topics: {
+                    3: 'Perkalian dan pembagian, pecahan sederhana, satuan panjang/berat/waktu, bangun datar',
+                    4: 'Operasi hitung campuran, pecahan (penjumlahan/pengurangan), keliling luas, sudut',
+                    5: 'Operasi hitung bilangan bulat, pecahan (perkalian/pembagian), skala, volume',
+                    6: 'Bilangan bulat negatif, aritmatika sosial (bunga, diskon), statistik dasar, bangun ruang'
+                }
+            },
+            'ipas': {
+                name: 'Ilmu Pengetahuan Alam dan Sosial',
+                icon: '🌍',
+                topics: {
+                    3: 'Makhluk hidup (ciri, pertumbuhan, daur hidup), wujud benda, cuaca dan iklim',
+                    4: 'Energi dan perubahannya, gaya dan gerak, ekosistem, peta dan atlas',
+                    5: 'Bumi dan tata surya, batuan dan tanah, sejarah kerajaan Indonesia, ekonomi sederhana',
+                    6: 'Bioteknologi, teknologi ramah lingkungan, perubahan sosial budaya, geografi Indonesia'
+                }
+            },
+            'sbdp': {
+                name: 'Seni Budaya dan Prakarya',
+                icon: '🎨',
+                topics: {
+                    3: 'Menggambar alam benda, mewarnai, origami, lagu anak-anak',
+                    4: 'Melukis dengan cat air, musik ritmis, tari tradisional, kerajinan dari kertas',
+                    5: 'Menggambar ilustrasi, musik melodis, tari kreasi, kerajinan dari limbah',
+                    6: 'Desain grafis sederhana, komposisi musik, tari modern, kerajinan tekstil'
+                }
+            },
+            'pjok': {
+                name: 'Pendidikan Jasmani, Olahraga dan Kesehatan',
+                icon: '🏃',
+                topics: {
+                    3: 'Gerak lokomotor (berjalan, berlari, melompat), permainan sederhana, kebersihan diri',
+                    4: 'Gerak non-lokomotor, permainan bola kecil (kasti), senam lantai, gizi seimbang',
+                    5: 'Atletik dasar (lari, lompat, lempar), permainan bola besar (basket), P3K sederhana',
+                    6: 'Renang gaya bebas, olahraga tradisional, kesehatan reproduksi dasar, first aid'
+                }
+            },
+            'binggris': {
+                name: 'Bahasa Inggris',
+                icon: '🇬🇧',
+                topics: {
+                    3: 'Greetings, numbers 1-100, colors, family members, animals',
+                    4: 'Daily activities, telling time, fruits and vegetables, simple present tense',
+                    5: 'Hobbies, occupations, public places, simple past tense',
+                    6: 'Vacation, transportation, health, future plans, descriptive text'
+                }
+            },
+            'bdaerah': {
+                name: 'Bahasa Daerah',
+                icon: '🗣️',
+                topics: {
+                    3: 'Aksara daerah, kosakata dasar, lagu tradisional, dongeng daerah',
+                    4: 'Percakapan sederhana, pantun/pepatah, cerita rakyat lokal',
+                    5: 'Teks prosedur, pidato bahasa daerah, aksara tradisional',
+                    6: 'Puisi daerah, drama tradisional, pelestarian budaya lisan'
+                }
             }
-        ];
+        };
 
-        const MAX_CONVERSATIONS = 1000;
-        const WARNING_THRESHOLD = 900;
-        const CRITICAL_THRESHOLD = 980;
-
-        let currentBotIndex = 0;
+        // State aplikasi
         let currentMode = 'text';
         let currentTool = 'pen';
         let isDrawing = false;
         let recognition = null;
         let canvas, ctx;
-        let isSwitching = false;
-        let currentUpload = null;
         let chatOpen = true;
         let stream = null;
-        let conversationData = {
-            month: null,
-            botCounters: [0, 0, 0],
-            currentBot: 0,
-            warningWarned: false,
-            criticalWarned: false
-        };
+        let currentUpload = null;
+        let questionCount = 0;
+        let isProcessing = false;
+        let apiReady = false;
+        let useVisionModel = false; // Toggle untuk menggunakan model vision
 
         document.addEventListener('DOMContentLoaded', () => {
-            initConversationData();
             initCanvas();
             initVoice();
-            initBotpress();
             loadNotes();
+            updateGradeIndicator();
+            updateSubjectInfo();
             updateCounterUI();
+            
+            // Cek API Key
+            if (GROQ_API_KEY && GROQ_API_KEY !== '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') {
+                testAPI();
+            } else if (GROQ_API_KEY) {
+                // API Key default dari kode, langsung test
+                testAPI();
+            } else {
+                showApiKeyModal();
+            }
             
             const textarea = document.getElementById('messageInput');
             textarea.addEventListener('input', function() {
@@ -1863,8 +1821,6 @@
 
             checkResponsive();
             window.addEventListener('resize', checkResponsive);
-            
-            // Handle orientation change
             window.addEventListener('orientationchange', () => {
                 setTimeout(() => {
                     resizeCanvas();
@@ -1873,136 +1829,375 @@
             });
         });
 
-        function checkResponsive() {
-            const width = window.innerWidth;
-            const sidebar = document.getElementById('chatSidebar');
-            const openBtn = document.getElementById('btnOpenChat');
-            
-            // Mobile: auto-close sidebar on small screens
-            if (width <= 767 && chatOpen) {
-                toggleChat();
-            }
-            
-            // Tablet: adjust sidebar based on preference
-            if (width >= 768 && width <= 1023) {
-                // Keep current state for tablet
+        // ==========================================
+        // API KEY MANAGEMENT
+        // ==========================================
+
+        function showApiKeyModal() {
+            document.getElementById('apikeyModal').classList.add('active');
+            if (GROQ_API_KEY) {
+                document.getElementById('apiKeyInput').value = GROQ_API_KEY;
             }
         }
 
-        function initConversationData() {
-            const now = new Date();
-            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-            const saved = localStorage.getItem('roboConversationData');
-            
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                if (parsed.month !== currentMonth) {
-                    conversationData = {
-                        month: currentMonth,
-                        botCounters: [0, 0, 0],
-                        currentBot: 0,
-                        warningWarned: false,
-                        criticalWarned: false
-                    };
-                    saveConversationData();
-                    showToast('🔄', 'BULAN BARU', 'Counter direset untuk periode baru!');
-                } else {
-                    conversationData = parsed;
-                    currentBotIndex = conversationData.currentBot;
-                }
-            } else {
-                conversationData = {
-                    month: currentMonth,
-                    botCounters: [0, 0, 0],
-                    currentBot: 0,
-                    warningWarned: false,
-                    criticalWarned: false
-                };
-                saveConversationData();
+        function closeApiKeyModal() {
+            document.getElementById('apikeyModal').classList.remove('active');
+        }
+
+        function saveApiKey() {
+            const newKey = document.getElementById('apiKeyInput').value.trim();
+            if (!newKey) {
+                showToast('❌', 'API KEY KOSONG', 'Masukkan API Key Groq terlebih dahulu!');
+                return;
             }
-            updateRefreshDate();
-        }
-
-        function saveConversationData() {
-            localStorage.setItem('roboConversationData', JSON.stringify(conversationData));
-        }
-
-        function updateRefreshDate() {
-            const now = new Date();
-            const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-            const options = { day: '2-digit', month: 'short', year: 'numeric' };
-            document.getElementById('refreshDate').textContent = 
-                `REFRESH: ${nextMonth.toLocaleDateString('id-ID', options).toUpperCase()}`;
-        }
-
-        function incrementCounter() {
-            conversationData.botCounters[currentBotIndex]++;
-            conversationData.currentBot = currentBotIndex;
-            saveConversationData();
-            updateCounterUI();
             
-            const count = conversationData.botCounters[currentBotIndex];
-            
-            if (count >= MAX_CONVERSATIONS) {
-                autoSwitchBot();
-            } else if (count >= CRITICAL_THRESHOLD && !conversationData.criticalWarned) {
-                conversationData.criticalWarned = true;
-                saveConversationData();
-                showToast('⚠️', 'PERINGATAN KRITIS', `${BOTS[currentBotIndex].name}: Tersisa ${MAX_CONVERSATIONS - count} percakapan!`);
-            } else if (count >= WARNING_THRESHOLD && !conversationData.warningWarned) {
-                conversationData.warningWarned = true;
-                saveConversationData();
-                showToast('📊', 'INFO KUOTA', `${BOTS[currentBotIndex].name}: Sudah ${count} percakapan, beralih otomatis segera.`);
+            if (!newKey.startsWith('gsk_')) {
+                showToast('⚠️', 'FORMAT SALAH', 'API Key Groq harus diawali dengan "gsk_"');
+                return;
             }
+            
+            GROQ_API_KEY = newKey;
+            localStorage.setItem('robo_groq_api_key', newKey);
+            closeApiKeyModal();
+            
+            // Test API baru
+            testAPI();
         }
 
-        function updateCounterUI() {
-            const count = conversationData.botCounters[currentBotIndex];
-            const remaining = MAX_CONVERSATIONS - count;
-            const percentage = (count / MAX_CONVERSATIONS) * 100;
-            
-            document.getElementById('counterValue').textContent = `${count}/${MAX_CONVERSATIONS}`;
-            document.getElementById('botActive').textContent = `${BOTS[currentBotIndex].name}`;
-            document.getElementById('remainingCount').textContent = `${remaining}`;
-            
-            const fill = document.getElementById('counterFill');
-            fill.style.width = `${percentage}%`;
-            fill.className = 'counter-bar';
-            
-            if (count >= CRITICAL_THRESHOLD) {
-                fill.classList.add('danger');
-            } else if (count >= WARNING_THRESHOLD) {
-                fill.classList.add('warning');
-            }
-        }
+        // ==========================================
+        // API TEST FUNCTION
+        // ==========================================
 
-        function autoSwitchBot() {
-            if (currentBotIndex >= BOTS.length - 1) {
-                showToast('❌', 'KUOTA HABIS', 'Semua 3 BOT telah mencapai batas maksimum!');
-                document.getElementById('messageInput').disabled = true;
-                document.getElementById('messageInput').placeholder = 'KUOTA HABIS - Hubungi admin';
+        async function testAPI() {
+            if (!GROQ_API_KEY) {
+                updateApiStatus('warning', 'API Key belum di-set. Klik untuk setting.');
                 return;
             }
 
-            isSwitching = true;
-            const nextIndex = currentBotIndex + 1;
+            updateApiStatus('warning', 'Testing Groq API...');
             
-            document.getElementById('switchingIndicator').classList.add('active');
-            addMessage(`🔄 ${BOTS[currentBotIndex].name} PENUH (${MAX_CONVERSATIONS}/${MAX_CONVERSATIONS}). MENGALIHKAN KE ${BOTS[nextIndex].name}...`, 'system');
+            try {
+                const response = await fetch(`${GROQ_BASE_URL}/chat/completions`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${GROQ_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: GROQ_MODEL_TEXT,
+                        messages: [{ role: 'user', content: 'Hi' }],
+                        max_tokens: 10
+                    })
+                });
+
+                if (response.ok) {
+                    apiReady = true;
+                    updateApiStatus('active', 'Groq AI siap digunakan! 🚀');
+                    showToast('✅', 'API TERHUBUNG', 'ROBO Teacher dengan Groq siap membantu!');
+                    
+                    // Update welcome message
+                    document.getElementById('chatMessages').innerHTML = `
+                        <div class="message bot">
+                            👋 Halo! Saya ROBO Teacher untuk SD Kelas 3-6 dengan <strong>Groq AI</strong>! 🚀<br><br>
+                            ⚡ <strong>Kecepatan Super Cepat</strong> dengan teknologi Groq LPU!<br><br>
+                            🎯 Mata Pelajaran:<br>
+                            🏛️ <strong>PKn</strong> - Pancasila & Kewarganegaraan<br>
+                            🇮🇩 <strong>Bahasa Indonesia</strong> - Literasi & Tata Bahasa<br>
+                            🔢 <strong>Matematika</strong> - Hitungan & Geometri<br>
+                            🌍 <strong>IPAS</strong> - Alam dan Sosial<br>
+                            🎨 <strong>SBdP</strong> - Seni dan Prakarya<br>
+                            🏃 <strong>PJOK</strong> - Olahraga & Kesehatan<br><br>
+                            💡 <strong>Fitur Baru:</strong> Upload gambar untuk dianalisis (Vision AI)!<br>
+                            Pilih mata pelajaran dan mulai bertanya! 🚀
+                        </div>
+                    `;
+                    
+                    // Check if vision model is available
+                    checkVisionAvailability();
+                } else {
+                    const error = await response.json();
+                    const errorMsg = error.error?.message || 'Unknown error';
+                    
+                    if (errorMsg.includes('quota') || errorMsg.includes('rate limit')) {
+                        updateApiStatus('error', 'Rate limit! Coba lagi nanti.');
+                        showToast('⚠️', 'RATE LIMIT', 'Free tier: 500K tokens/hari. Coba lagi nanti.');
+                    } else if (errorMsg.includes('authentication') || errorMsg.includes('invalid')) {
+                        updateApiStatus('error', 'API Key invalid! Klik untuk ganti.');
+                        showToast('❌', 'API KEY SALAH', 'Periksa kembali API Key Groq Anda.');
+                    } else {
+                        updateApiStatus('error', 'Error: ' + errorMsg.substring(0, 50));
+                        showToast('❌', 'API ERROR', errorMsg.substring(0, 100));
+                    }
+                }
+            } catch (err) {
+                updateApiStatus('error', 'Network Error');
+                showToast('❌', 'NETWORK ERROR', 'Cek koneksi internet Anda.');
+            }
+        }
+
+        async function checkVisionAvailability() {
+            // Cek apakah model vision tersedia
+            try {
+                const response = await fetch(`${GROQ_BASE_URL}/models`, {
+                    headers: {
+                        'Authorization': `Bearer ${GROQ_API_KEY}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const hasVision = data.data.some(model => model.id.includes('vision') || model.id.includes('llama-4'));
+                    if (hasVision) {
+                        document.getElementById('visionBadge').style.display = 'inline-flex';
+                        useVisionModel = true;
+                    }
+                }
+            } catch (e) {
+                console.log('Vision check failed:', e);
+            }
+        }
+
+        function updateApiStatus(status, message) {
+            const statusEl = document.getElementById('apiStatus');
+            statusEl.className = `api-status ${status}`;
             
-            setTimeout(() => {
-                currentBotIndex = nextIndex;
-                conversationData.currentBot = currentBotIndex;
-                saveConversationData();
-                initBotpress();
+            let icon = '⚠️';
+            if (status === 'active') icon = '🚀';
+            if (status === 'error') icon = '❌';
+            
+            statusEl.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+        }
+
+        // ==========================================
+        // AI CHAT FUNCTIONALITY - GROQ API
+        // ==========================================
+
+        async function sendMessage() {
+            if (!apiReady) {
+                showToast('⚠️', 'API BELUM SIAP', 'Klik tombol kuning di atas untuk setting API Key');
+                showApiKeyModal();
+                return;
+            }
+
+            if (isProcessing) {
+                showToast('⏳', 'MOHON TUNGGU', 'Sedang memproses pertanyaan sebelumnya...');
+                return;
+            }
+
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (!text && !currentUpload) return;
+
+            // Validasi konten
+            if (!validateContent(text)) {
+                addMessage('Maaf, pertanyaan ini di luar topik SD Kelas 3-6 atau mengandung konten tidak sesuai. Yuk kita belajar pelajaran SD! 📚', 'bot');
+                input.value = '';
+                return;
+            }
+
+            isProcessing = true;
+
+            // Tampilkan pesan user
+            if (currentUpload) {
+                addMessage(text || '📷 GAMBAR:', 'user', currentUpload);
+            } else {
+                addMessage(text, 'user');
+            }
+            
+            input.value = '';
+            input.style.height = 'auto';
+            showTyping();
+
+            try {
+                const response = await callGroqAPI(text, currentUpload);
+                hideTyping();
+                addMessage(response, 'bot');
                 
-                document.getElementById('switchingIndicator').classList.remove('active');
-                showToast('✅', 'BERHASIL BERGANTI', `${BOTS[currentBotIndex].name} AKTIF!`);
-                addMessage(`✅ ${BOTS[currentBotIndex].name} SIAP DIGUNAKAN! (${conversationData.botCounters[currentBotIndex]}/${MAX_CONVERSATIONS})`, 'bot');
-                
+                // Update counter
+                questionCount++;
                 updateCounterUI();
-                isSwitching = false;
-            }, 2000);
+                
+                // Clear upload after successful send
+                if (currentUpload) {
+                    removeUpload();
+                }
+                
+            } catch (error) {
+                hideTyping();
+                console.error('API Error:', error);
+                
+                if (error.message.includes('rate limit') || error.message.includes('quota')) {
+                    addMessage('⚠️ Maaf, rate limit tercapai (500K tokens/hari untuk free tier). Silakan tunggu beberapa saat atau upgrade ke paid tier di console.groq.com.', 'bot');
+                    updateApiStatus('warning', 'Rate limit! Coba lagi nanti.');
+                } else if (error.message.includes('authentication')) {
+                    addMessage('⚠️ API Key tidak valid. Silakan periksa kembali API Key Groq Anda.', 'bot');
+                    updateApiStatus('error', 'API Key invalid! Klik untuk ganti.');
+                    apiReady = false;
+                } else {
+                    addMessage(`Maaf, terjadi kesalahan: ${error.message}. Coba lagi ya! 🤖`, 'bot');
+                }
+            } finally {
+                isProcessing = false;
+            }
+        }
+
+        async function callGroqAPI(userMessage, imageData = null) {
+            const subject = document.getElementById('subjectSelect').value;
+            const [subjectKey, grade] = subject.split('-');
+            
+            // Build system prompt
+            const subjectData = CURRICULUM_DATA[subjectKey];
+            const age = parseInt(grade) + 5;
+            const topics = subjectData.topics[grade];
+            
+            const systemPrompt = `Anda adalah ROBO Teacher, asisten AI khusus untuk siswa SD Kelas ${grade} Indonesia.
+
+IDENTITAS:
+- Nama: ROBO Teacher
+- Versi: 4.0 Groq Edition (Ultra Fast)
+- Target: Siswa SD Kelas ${grade} (usia ${age} tahun)
+- Mata Pelajaran: ${subjectData.name}
+
+TOPIK YANG BOLEH DIAJarkan:
+${topics}
+
+ATURAN KETAT:
+1. Hanya jawab pertanyaan terkait kurikulum SD Kelas ${grade} di atas
+2. Gunakan bahasa Indonesia sederhana, ramah, sesuai usia ${age} tahun
+3. Berikan contoh konkret dari kehidupan sehari-hari anak Indonesia
+4. Gunakan emoji dan format yang menarik
+5. Jika ditanya di luar topik di atas, tolak dengan sopan dan arahkan ke topik yang relevan
+6. Jangan pernah memberikan konten: kekerasan, seks, narkoba, politik partisan, agama ekstrem, hoaks
+7. Dorong siswa untuk berpikir kritis dan bertanya lebih lanjut
+8. Maksimal 3-4 paragraf per jawaban, gunakan poin-poin
+
+Jawab dengan hangat, mendidik, dan sesuai kurikulum!`;
+
+            // Pilih model berdasarkan ada tidaknya gambar
+            const model = (imageData && useVisionModel) ? GROQ_MODEL_VISION : GROQ_MODEL_TEXT;
+            
+            // Build messages array (OpenAI format)
+            const messages = [
+                {
+                    role: 'system',
+                    content: systemPrompt
+                }
+            ];
+
+            // Handle image + text input
+            if (imageData) {
+                // Convert base64 to proper format
+                const base64Data = imageData.split(',')[1];
+                const mimeType = imageData.split(';')[0].split(':')[1] || 'image/jpeg';
+                
+                if (useVisionModel) {
+                    // Vision model format (Llama 4 Scout)
+                    messages.push({
+                        role: 'user',
+                        content: [
+                            {
+                                type: 'text',
+                                text: userMessage || 'Jelaskan gambar ini sesuai pelajaran ' + subjectData.name
+                            },
+                            {
+                                type: 'image_url',
+                                image_url: {
+                                    url: `data:${mimeType};base64,${base64Data}`
+                                }
+                            }
+                        ]
+                    });
+                } else {
+                    // Fallback untuk model non-vision: kirim sebagai text saja dengan info gambar
+                    messages.push({
+                        role: 'user',
+                        content: (userMessage || 'Jelaskan gambar ini') + ' [User mengirimkan gambar, mohon analisis berdasarkan deskripsi visual yang mungkin]'
+                    });
+                }
+            } else {
+                messages.push({
+                    role: 'user',
+                    content: userMessage || 'Halo ROBO Teacher!'
+                });
+            }
+
+            const requestBody = {
+                model: model,
+                messages: messages,
+                temperature: 0.7,
+                max_tokens: 2048,
+                top_p: 0.9,
+                stream: false
+            };
+
+            const response = await fetch(`${GROQ_BASE_URL}/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${GROQ_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Groq API Error:', errorData);
+                
+                // Handle specific error codes [^6^]
+                if (response.status === 429) {
+                    throw new Error('Rate limit exceeded. Free tier: 500K tokens/day');
+                } else if (response.status === 401) {
+                    throw new Error('Authentication failed. Invalid API Key.');
+                } else if (response.status === 400) {
+                    throw new Error('Bad request: ' + (errorData.error?.message || 'Invalid parameters'));
+                }
+                
+                throw new Error(errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            
+            if (!data.choices || data.choices.length === 0) {
+                throw new Error('Tidak ada respons dari AI');
+            }
+
+            return data.choices[0].message.content;
+        }
+
+        function validateContent(text) {
+            if (!text) return true;
+            
+            const lowerText = text.toLowerCase();
+            const forbiddenWords = [
+                'sex', 'porn', 'narkoba', 'ganja', 'sabu', 'putaw',
+                'bunuh', 'bunuh diri', 'senjata', 'pisau', 'tusuk'
+            ];
+            
+            for (const word of forbiddenWords) {
+                if (lowerText.includes(word)) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // ==========================================
+        // UI FUNCTIONS
+        // ==========================================
+
+        function updateCounterUI() {
+            document.getElementById('counterValue').textContent = questionCount;
+            
+            const percentage = Math.min((questionCount / 100) * 100, 100);
+            document.getElementById('counterFill').style.width = `${percentage}%`;
+            
+            if (questionCount > 80) {
+                document.getElementById('counterFill').classList.add('danger');
+            } else if (questionCount > 50) {
+                document.getElementById('counterFill').classList.add('warning');
+            }
         }
 
         function toggleChat() {
@@ -2021,32 +2216,6 @@
             }
         }
 
-        function initBotpress() {
-            const bot = BOTS[currentBotIndex];
-            try { 
-                if (window.botpress && window.botpress.close) {
-                    window.botpress.close(); 
-                }
-            } catch(e) {}
-            
-            window.botpress.init({
-                botId: bot.id,
-                clientId: bot.clientId,
-                host: "https://cdn.botpress.cloud/webchat/v2.2",
-                messagingUrl: "https://messaging.botpress.cloud",
-                showPoweredBy: false,
-                hideWidget: true,
-                lazySocket: true
-            });
-
-            window.botpress.on('message', (msg) => {
-                if (msg.type === 'text') {
-                    hideTyping();
-                    addMessage(msg.payload.text, 'bot');
-                }
-            });
-        }
-
         function addMessage(text, sender, imageData = null) {
             const container = document.getElementById('chatMessages');
             const div = document.createElement('div');
@@ -2055,7 +2224,13 @@
             if (imageData) {
                 div.innerHTML = `<div>${text}</div><img src="${imageData}" class="message-image" onclick="viewImage('${imageData}')">`;
             } else {
-                div.textContent = text;
+                let formattedText = text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/```([\s\S]*?)```/g, '<pre style="background:#f1f5f9;padding:8px;border-radius:6px;overflow-x:auto;"><code>$1</code></pre>')
+                    .replace(/`([^`]+)`/g, '<code style="background:#f1f5f9;padding:2px 4px;border-radius:3px;">$1</code>')
+                    .replace(/\n/g, '<br>');
+                div.innerHTML = formattedText;
             }
             
             container.appendChild(div);
@@ -2082,40 +2257,6 @@
             document.getElementById('typingIndicator')?.remove();
         }
 
-        function sendMessage() {
-            if (isSwitching) {
-                showToast('⏳', 'MOHON TUNGGU', 'Sedang beralih sistem BOT...');
-                return;
-            }
-
-            if (conversationData.botCounters[currentBotIndex] >= MAX_CONVERSATIONS) {
-                autoSwitchBot();
-                return;
-            }
-
-            const input = document.getElementById('messageInput');
-            const text = input.value.trim();
-            
-            if (!text && !currentUpload) return;
-
-            incrementCounter();
-
-            if (currentUpload) {
-                addMessage(text || '📷 GAMBAR:', 'user', currentUpload);
-                removeUpload();
-            } else {
-                addMessage(text, 'user');
-            }
-            
-            input.value = '';
-            input.style.height = 'auto';
-            showTyping();
-            
-            if (window.botpress && window.botpress.sendMessage) {
-                window.botpress.sendMessage({ text: text || 'Lihat gambar ini' });
-            }
-        }
-
         function handleKeyPress(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -2123,14 +2264,57 @@
             }
         }
 
+        function updateGradeIndicator() {
+            const subject = document.getElementById('subjectSelect').value;
+            const grade = subject.split('-')[1] || '3';
+            document.getElementById('gradeIndicator').textContent = `KELAS ${grade}`;
+        }
+
+        function updateSubjectInfo() {
+            const subject = document.getElementById('subjectSelect').value;
+            const [subjectKey, grade] = subject.split('-');
+            const subjectData = CURRICULUM_DATA[subjectKey];
+            
+            const infoDiv = document.getElementById('subjectInfo');
+            if (subjectData && infoDiv) {
+                const topics = subjectData.topics[grade];
+                infoDiv.innerHTML = `<strong>${subjectData.icon} ${subjectData.name} Kelas ${grade}:</strong> ${topics}`;
+            }
+        }
+
+        function changeSubject(subject) {
+            saveNotes();
+            loadNotes();
+            updateGradeIndicator();
+            updateSubjectInfo();
+            
+            const subjectKey = subject.split('-')[0];
+            const grade = subject.split('-')[1];
+            const subjectData = CURRICULUM_DATA[subjectKey];
+            
+            if (subjectData) {
+                addMessage(`📚 BERALIH KE: ${subjectData.name} Kelas ${grade}`, 'bot');
+            }
+        }
+
+        // ==========================================
+        // FILE UPLOAD & CAMERA
+        // ==========================================
+
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
+            
+            if (file.size > 4 * 1024 * 1024) {
+                showToast('⚠️', 'UKURAN TERLALU BESAR', 'Maksimal 4MB untuk Groq Vision!');
+                return;
+            }
             
             const reader = new FileReader();
             reader.onload = (e) => {
                 currentUpload = e.target.result;
                 showUploadPreview(currentUpload);
+                showToast('📷', 'GAMBER SIAP', 'Gambar akan dianalisis dengan AI Vision!');
             };
             reader.readAsDataURL(file);
         }
@@ -2165,18 +2349,18 @@
 
         function takePhoto() {
             const video = document.getElementById('cameraVideo');
-            const canvas = document.getElementById('cameraCanvas');
-            const ctx = canvas.getContext('2d');
+            const cameraCanvas = document.getElementById('cameraCanvas');
+            const ctx = cameraCanvas.getContext('2d');
             
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            cameraCanvas.width = video.videoWidth;
+            cameraCanvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0);
             
-            currentUpload = canvas.toDataURL('image/jpeg');
+            currentUpload = cameraCanvas.toDataURL('image/jpeg', 0.8);
             showUploadPreview(currentUpload);
             closeCamera();
             
-            showToast('📷', 'BERHASIL', 'Foto diambil! Klik kirim untuk mengirim.');
+            showToast('📷', 'BERHASIL', 'Foto diambil! Klik kirim untuk mengirim ke AI Vision.');
         }
 
         function closeCamera() {
@@ -2193,6 +2377,10 @@
             window.open(src, '_blank');
         }
 
+        // ==========================================
+        // VOICE INPUT
+        // ==========================================
+
         function initVoice() {
             if (!('webkitSpeechRecognition' in window)) return;
             
@@ -2208,10 +2396,19 @@
             recognition.onend = () => {
                 document.getElementById('voiceBtn').classList.remove('recording');
             };
+            
+            recognition.onerror = (e) => {
+                console.error('Voice recognition error:', e);
+                document.getElementById('voiceBtn').classList.remove('recording');
+                showToast('❌', 'VOICE ERROR', 'Coba lagi ya!');
+            };
         }
 
         function toggleVoice() {
-            if (!recognition) return alert('Browser tidak mendukung voice input');
+            if (!recognition) {
+                showToast('❌', 'BROWSER TIDAK MENDUKUNG', 'Gunakan Chrome ya!');
+                return;
+            }
             
             const btn = document.getElementById('voiceBtn');
             if (btn.classList.contains('recording')) {
@@ -2220,8 +2417,13 @@
             } else {
                 recognition.start();
                 btn.classList.add('recording');
+                showToast('🎤', 'MENDENGARKAN...', 'Bicara sekarang!');
             }
         }
+
+        // ==========================================
+        // CANVAS FUNCTIONS
+        // ==========================================
 
         function initCanvas() {
             canvas = document.getElementById('drawingCanvas');
@@ -2229,13 +2431,11 @@
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
             
-            // Mouse events
             canvas.addEventListener('mousedown', startDraw);
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', stopDraw);
             canvas.addEventListener('mouseout', stopDraw);
             
-            // Touch events with proper handling
             canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
             canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
             canvas.addEventListener('touchend', stopDraw);
@@ -2246,7 +2446,6 @@
             const parent = canvas.parentElement;
             if (!parent) return;
             
-            // Save current content
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
             tempCanvas.width = canvas.width;
@@ -2260,7 +2459,6 @@
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             
-            // Restore content
             if (tempCanvas.width > 0 && tempCanvas.height > 0) {
                 ctx.drawImage(tempCanvas, 0, 0);
             }
@@ -2344,14 +2542,19 @@
             showToast('💾', 'BERHASIL', 'Gambar disimpan!');
         }
 
-        function askFromContent() {
-            if (isSwitching) {
-                showToast('⏳', 'MOHON TUNGGU', 'Sedang beralih sistem...');
+        // ==========================================
+        // SAVE & EXPORT
+        // ==========================================
+
+        async function askFromContent() {
+            if (!apiReady) {
+                showToast('⚠️', 'API BELUM SIAP', 'Setting API Key terlebih dahulu');
+                showApiKeyModal();
                 return;
             }
 
-            if (conversationData.botCounters[currentBotIndex] >= MAX_CONVERSATIONS) {
-                autoSwitchBot();
+            if (isProcessing) {
+                showToast('⏳', 'MOHON TUNGGU', 'Sedang memproses...');
                 return;
             }
 
@@ -2365,24 +2568,47 @@
                     return;
                 }
             } else {
-                question = "[GAMBAR KANVAS] Bisakah ROBO Teacher menjelaskan gambar ini?";
+                question = "[GAMBAR KANVAS] Bisakah ROBO Teacher menjelaskan gambar ini sesuai pelajaran yang sedang dipelajari?";
                 const canvasData = canvas.toDataURL('image/png');
-                incrementCounter();
+                
+                if (!chatOpen) toggleChat();
+                
                 addMessage(question, 'user', canvasData);
                 showTyping();
-                if (window.botpress && window.botpress.sendMessage) {
-                    window.botpress.sendMessage({ text: question });
+                isProcessing = true;
+                
+                try {
+                    const response = await callGroqAPI(question, canvasData);
+                    hideTyping();
+                    addMessage(response, 'bot');
+                    questionCount++;
+                    updateCounterUI();
+                } catch (error) {
+                    hideTyping();
+                    addMessage(`Maaf, error: ${error.message}`, 'bot');
+                } finally {
+                    isProcessing = false;
                 }
                 return;
             }
             
             if (!chatOpen) toggleChat();
             
-            incrementCounter();
             addMessage(question, 'user');
             showTyping();
-            if (window.botpress && window.botpress.sendMessage) {
-                window.botpress.sendMessage({ text: question });
+            isProcessing = true;
+            
+            try {
+                const response = await callGroqAPI(question);
+                hideTyping();
+                addMessage(response, 'bot');
+                questionCount++;
+                updateCounterUI();
+            } catch (error) {
+                hideTyping();
+                addMessage(`Maaf, error: ${error.message}`, 'bot');
+            } finally {
+                isProcessing = false;
             }
         }
 
@@ -2401,11 +2627,11 @@
             const subjectName = subject.options[subject.selectedIndex].text;
             
             pdf.setFontSize(22);
-            pdf.text(`ROBO TEACHER - ${subjectName}`, 20, 25);
+            pdf.text(`ROBO TEACHER SD - ${subjectName}`, 20, 25);
             pdf.setFontSize(12);
             pdf.text(`Tanggal: ${new Date().toLocaleDateString('id-ID')}`, 20, 35);
-            pdf.text(`Bot Aktif: ${BOTS[currentBotIndex].name}`, 20, 42);
-            pdf.text(`Percakapan: ${conversationData.botCounters[currentBotIndex]}/${MAX_CONVERSATIONS}`, 20, 49);
+            pdf.text(`Total Pertanyaan: ${questionCount}`, 20, 42);
+            pdf.text(`Powered by: Groq AI`, 20, 49);
             
             const notes = document.getElementById('notesEditor').value;
             if (notes) {
@@ -2421,24 +2647,27 @@
                 pdf.addImage(canvasData, 'PNG', 20, 30, 170, 100);
             }
             
-            pdf.save(`ROBO-${subjectName}-${Date.now()}.pdf`);
+            pdf.save(`ROBO-SD-Groq-${subjectName}-${Date.now()}.pdf`);
             closeSaveModal();
             showToast('📄', 'PDF TERSIMPAN', 'File berhasil diunduh!');
         }
 
         function saveAsJSON() {
+            const subject = document.getElementById('subjectSelect').value;
+            const [subjectKey, grade] = subject.split('-');
+            
             const data = {
-                roboVersion: "2.0",
+                roboVersion: "4.0-Groq-Edition",
                 tanggal: new Date().toISOString(),
-                mataPelajaran: document.getElementById('subjectSelect').value,
+                mataPelajaran: subject,
+                namaPelajaran: CURRICULUM_DATA[subjectKey]?.name || subject,
+                kelas: grade,
                 catatan: document.getElementById('notesEditor').value,
                 canvas: currentMode === 'canvas' ? canvas.toDataURL() : null,
                 statistik: {
-                    botAktif: BOTS[currentBotIndex].name,
-                    percakapanBulanIni: conversationData.botCounters[currentBotIndex],
-                    sisaKuota: MAX_CONVERSATIONS - conversationData.botCounters[currentBotIndex],
-                    totalBots: BOTS.length,
-                    refreshDate: document.getElementById('refreshDate').textContent
+                    totalPertanyaan: questionCount,
+                    api: 'Groq Cloud',
+                    model: GROQ_MODEL_TEXT
                 }
             };
             
@@ -2446,7 +2675,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ROBO-DATA-${Date.now()}.json`;
+            a.download = `ROBO-SD-GROQ-DATA-${Date.now()}.json`;
             a.click();
             URL.revokeObjectURL(url);
             
@@ -2458,7 +2687,7 @@
             const workspace = document.getElementById('workspace');
             
             try {
-                const canvas = await html2canvas(workspace, {
+                const canvasElement = await html2canvas(workspace, {
                     scale: 2,
                     backgroundColor: '#ffffff',
                     useCORS: true,
@@ -2466,8 +2695,8 @@
                 });
                 
                 const link = document.createElement('a');
-                link.download = `ROBO-SCREENSHOT-${Date.now()}.png`;
-                link.href = canvas.toDataURL();
+                link.download = `ROBO-SD-SCREENSHOT-${Date.now()}.png`;
+                link.href = canvasElement.toDataURL();
                 link.click();
                 
                 closeSaveModal();
@@ -2490,13 +2719,6 @@
             }
         }
 
-        function changeSubject(subject) {
-            saveNotes();
-            loadNotes();
-            const subjectName = event.target.options[event.target.selectedIndex].text;
-            addMessage(`📚 BERALIH KE: ${subjectName.toUpperCase()}`, 'bot');
-        }
-
         function saveNotes() {
             const subject = document.getElementById('subjectSelect').value;
             localStorage.setItem(`robo_notes_${subject}`, document.getElementById('notesEditor').value);
@@ -2517,21 +2739,34 @@
             setTimeout(() => toast.classList.remove('show'), 4000);
         }
 
+        function checkResponsive() {
+            const width = window.innerWidth;
+            if (width <= 767 && chatOpen) {
+                toggleChat();
+            }
+        }
+
+        // Auto-save notes
         let saveTimeout;
         document.getElementById('notesEditor').addEventListener('input', () => {
             clearTimeout(saveTimeout);
             saveTimeout = setTimeout(saveNotes, 1000);
         });
 
+        // Close modals on click outside
         document.getElementById('saveModal').addEventListener('click', (e) => {
             if (e.target === e.currentTarget) closeSaveModal();
         });
+        document.getElementById('apikeyModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeApiKeyModal();
+        });
 
-        // Close modal on Escape key
+        // Escape key to close modals
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeSaveModal();
                 closeCamera();
+                closeApiKeyModal();
             }
         });
     </script>
