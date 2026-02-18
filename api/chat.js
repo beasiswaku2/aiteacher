@@ -1,64 +1,34 @@
 // api/chat.js
-// Ini adalah Serverless Function Vercel dengan Firebase Auth verification
-
-// Anda perlu menginstall firebase-admin: npm install firebase-admin
-const admin = require('firebase-admin');
-
-// Inisialisasi Firebase Admin (gunakan service account dari Firebase Console)
-if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert({
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
-        })
-    });
-}
+// Ini adalah Serverless Function Vercel yang berfungsi sebagai jembatan aman.
 
 export default async function handler(req, res) {
+    // Hanya izinkan metode POST
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
+    // Ambil API Key dari Environment Variables Vercel (PENTING!)
     const GROQ_API_KEY = process.env.GROQ_API_KEY;
+
+    // Jika key tidak ada di setting Vercel
     if (!GROQ_API_KEY) {
         return res.status(500).json({ error: 'API Key belum diset di server.' });
     }
 
     try {
-        const { message, subject, image, test, userId } = req.body;
-        
-        // Verifikasi Firebase ID Token dari header
-        const authHeader = req.headers.authorization;
-        let verifiedUserId = null;
-        
-        if (authHeader && authHeader.startsWith('Bearer ')) {
-            const idToken = authHeader.split('Bearer ')[1];
-            try {
-                const decodedToken = await admin.auth().verifyIdToken(idToken);
-                verifiedUserId = decodedToken.uid;
-            } catch (error) {
-                console.log('Token verification failed:', error.message);
-                // Tetap lanjutkan tapi tandai sebagai unauthenticated
-            }
-        }
+        const { message, subject, image, test } = req.body;
 
         // Jika hanya test koneksi
         if (test) {
-            return res.status(200).json({ 
-                status: 'ok',
-                authenticated: !!verifiedUserId,
-                userId: verifiedUserId
-            });
+            return res.status(200).json({ status: 'ok' });
         }
 
-        // Optional: Cek rate limit berdasarkan userId
-        // Anda bisa simpan counter di database atau memory
-        
+        // Logika pemilihan model dan prompt (Dipindahkan dari HTML ke sini agar aman)
         const GROQ_MODEL_TEXT = 'llama-3.3-70b-versatile';
         const GROQ_MODEL_VISION = 'meta-llama/llama-4-scout-17b-16e-instruct';
         const GROQ_BASE_URL = 'https://api.groq.com/openai/v1';
 
+        // Parsing subject
         const [subjectKey, grade] = subject ? subject.split('-') : ['pkn', '3'];
         const CURRICULUM_DATA = {
             'pkn': { name: 'PKn', topics: { 3: 'Pancasila', 4: 'NKRI', 5: 'HAM', 6: 'Globalisasi' } },
@@ -88,6 +58,7 @@ export default async function handler(req, res) {
             messages.push({ role: 'user', content: message });
         }
 
+        // Panggil API Groq dari sini (Backend)
         const response = await fetch(`${GROQ_BASE_URL}/chat/completions`, {
             method: 'POST',
             headers: {
@@ -108,10 +79,8 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: data.error?.message || 'Groq API Error' });
         }
 
-        return res.status(200).json({ 
-            reply: data.choices[0].message.content,
-            userId: verifiedUserId // Kembalikan untuk konfirmasi
-        });
+        // Kirim jawaban kembali ke frontend
+        return res.status(200).json({ reply: data.choices[0].message.content });
 
     } catch (error) {
         console.error(error);
