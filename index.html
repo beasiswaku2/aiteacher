@@ -3,17 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROBO Teacher AI - Asisten Belajar Bersama AI</title>
+    <title>ROBO Teacher SD - Asisten Belajar AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
     <style>
         :root { 
@@ -42,225 +37,6 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         .app-container { display: flex; height: 100vh; height: 100dvh; position: relative; }
-        
-        /* === LOGIN OVERLAY === */
-        .login-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-        
-        .login-overlay.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-        
-        .login-container {
-            background: var(--bg-white);
-            padding: 48px;
-            border-radius: var(--radius-lg);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            text-align: center;
-            max-width: 420px;
-            width: 90%;
-            animation: slideUp 0.6s ease;
-        }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .login-logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            font-size: 40px;
-            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
-        }
-        
-        .login-title {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--text-main);
-            margin-bottom: 8px;
-        }
-        
-        .login-subtitle {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 32px;
-            line-height: 1.6;
-        }
-        
-        .btn-google {
-            width: 100%;
-            padding: 14px 24px;
-            background: var(--bg-white);
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-md);
-            font-family: inherit;
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-main);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            transition: all 0.3s ease;
-            margin-bottom: 12px;
-        }
-        
-        .btn-google:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-        
-        .btn-google img {
-            width: 20px;
-            height: 20px;
-        }
-        
-        .btn-guest {
-            width: 100%;
-            padding: 14px 24px;
-            background: transparent;
-            border: 2px dashed var(--border-color);
-            border-radius: var(--radius-md);
-            font-family: inherit;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-guest:hover {
-            border-color: var(--secondary);
-            color: var(--secondary);
-            background: #f0fdf4;
-        }
-        
-        .login-divider {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin: 24px 0;
-            color: var(--text-muted);
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .login-divider::before,
-        .login-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border-color);
-        }
-        
-        .login-footer {
-            margin-top: 32px;
-            font-size: 12px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-        
-        /* === KUOTA WARNING === */
-        .quota-warning {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-            padding: 16px 24px;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-lg);
-            z-index: 5000;
-            display: none;
-            align-items: center;
-            gap: 12px;
-            font-weight: 600;
-            animation: slideDown 0.4s ease;
-        }
-        
-        .quota-warning.show {
-            display: flex;
-        }
-        
-        @keyframes slideDown {
-            from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
-            to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-        
-        /* User Profile di Header */
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 12px;
-            background: var(--bg-white);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-full);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .user-profile:hover {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: var(--radius-full);
-            object-fit: cover;
-        }
-        
-        .user-info {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .user-name {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-main);
-            max-width: 120px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        .user-email {
-            font-size: 10px;
-            color: var(--text-muted);
-            max-width: 120px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
         
         /* Chat Sidebar Styles */
         .chat-sidebar { width: 380px; min-width: 380px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-right: 1px solid rgba(226, 232, 240, 0.8); display: flex; flex-direction: column; box-shadow: var(--shadow-lg); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; z-index: 100; }
@@ -390,7 +166,7 @@
         .mode-toggle { display: flex; background: var(--bg-main); border-radius: var(--radius-sm); padding: 4px; gap: 4px; border: 1px solid var(--border-color); }
         .mode-btn { padding: 10px 18px; border: none; background: transparent; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--text-muted); }
         .mode-btn.active { background: var(--bg-white); color: var(--primary); box-shadow: var(--shadow-sm); }
-        .toolbar-actions { display: flex; gap: 10px; align-items: center; }
+        .toolbar-actions { display: flex; gap: 10px; }
         .btn-ask { padding: 12px 22px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; cursor: pointer; text-transform: uppercase; }
         .btn-save { padding: 12px 20px; background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%); color: white; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; }
         .content-area { flex: 1; position: relative; overflow: hidden; display: flex; width: 100%; background: var(--bg-main); }
@@ -726,53 +502,11 @@
             .mode-toggle { width: 100%; }
             .canvas-toolbar { flex-wrap: wrap; }
             .tool-dropdown-btn { min-width: 90px; font-size: 12px; }
-            
-            .login-container {
-                padding: 32px 24px;
-            }
-            
-            .user-profile .user-info {
-                display: none;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- KUOTA WARNING -->
-    <div class="quota-warning" id="quotaWarning">
-        <span>⚠️</span>
-        <span id="quotaMessage">Kuota pertanyaan Anda telah habis!</span>
-    </div>
-
-    <!-- LOGIN OVERLAY -->
-    <div class="login-overlay" id="loginOverlay">
-        <div class="login-container">
-            <div class="login-logo">🤖</div>
-            <h1 class="login-title">ROBO Teacher AI</h1>
-            <p class="login-subtitle">
-                Asisten belajar AI untuk siswa SD, SMP, dan SMA.<br>
-                Masuk untuk mulai belajar!
-            </p>
-            
-            <button class="btn-google" onclick="signInWithGoogle()">
-                <img src="https://www.google.com/favicon.ico" alt="Google">
-                Masuk dengan Google
-            </button>
-            
-            <div class="login-divider">ATAU</div>
-            
-            <button class="btn-guest" onclick="signInAsGuest()">
-                Lanjutkan sebagai Tamu (Limited)
-            </button>
-            
-            <div class="login-footer">
-                <strong>Perhatian:</strong> Kuota 2000 pertanyaan/bulan.<br>
-                Data Anda aman dan tidak akan dibagikan.
-            </div>
-        </div>
-    </div>
-
-    <div class="app-container" id="appContainer" style="display: none;">
+    <div class="app-container">
         <aside class="chat-sidebar" id="chatSidebar">
             <div class="chat-header">
                 <button class="btn-close-sidebar" onclick="toggleChat()" title="Tutup Chat">×</button>
@@ -786,20 +520,20 @@
                     </div>
                     <div class="counter-card">
                         <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                            <span style="font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">SISA KUOTA</span>
+                            <span style="font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">JMH PERTANYAAN</span>
                             <span class="counter-value" id="counterValue">0</span>
                         </div>
                         <div style="height: 6px; background: var(--bg-main); border-radius: 9999px; overflow: hidden;">
                             <div id="counterFill" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), #fb923c);"></div>
                         </div>
                         <div class="counter-footer">
-                            <span id="periodInfo">Periode: -</span>
+                            <span id="apiProvider">AI TEACHER</span>
                             <span id="remainingCount">Max 2000/Bln</span>
                         </div>
                     </div>
                 </div>
                 <div style="background: var(--bg-main); padding: 8px 12px; border-radius: var(--radius-sm); font-size: 10px; text-align: center; color: var(--text-muted); font-weight: 600; margin-top: 8px;">
-                    Reset otomatis setiap tanggal 1
+                    Wantu Update setiap Tgl 1
                 </div>
                 <div class="api-status warning" id="apiStatus">
                     <span>⚠️</span>
@@ -813,8 +547,7 @@
                     🎯 Pilih Kelas dan Mata Pelajaran di toolbar atas.<br>
                     • SD Kelas 1-6<br>
                     • SMP Kelas 7-9<br>
-                    • SMA/SMK Kelas 10-12<br><br>
-                    📊 Kuota Anda: <span id="welcomeQuota">Memuat...</span>
+                    • SMA/SMK Kelas 10-12
                 </div>
             </div>
 
@@ -828,11 +561,11 @@
                     <button class="btn-tool" onclick="openCamera()" title="Foto Kamera">📷</button>
                 </div>
                 <div class="input-box">
-                    <textarea id="messageInput" placeholder="Ketik pertanyaanmu..." rows="3" onkeypress="handleKeyPress(event)" disabled></textarea>
+                    <textarea id="messageInput" placeholder="Ketik pertanyaanmu..." rows="3" onkeypress="handleKeyPress(event)"></textarea>
                 </div>
                 <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                    <button class="btn-icon voice" id="voiceBtn" onclick="toggleVoice()" title="Voice Input" disabled>🎤</button>
-                    <button class="btn-send" onclick="sendMessage()" title="Kirim" disabled>➤</button>
+                    <button class="btn-icon voice" id="voiceBtn" onclick="toggleVoice()" title="Voice Input">🎤</button>
+                    <button class="btn-send" onclick="sendMessage()" title="Kirim">➤</button>
                 </div>
             </div>
         </aside>
@@ -842,6 +575,7 @@
         <main class="workspace" id="workspace">
             <div class="toolbar">
                 <div class="toolbar-left">
+                    <!-- Dropdown Kelas -->
                     <div class="select-wrapper">
                         <select class="grade-select" id="gradeSelect" onchange="changeGrade(this.value)">
                             <option value="" disabled selected>Pilih Kelas</option>
@@ -866,6 +600,7 @@
                         </select>
                     </div>
 
+                    <!-- Dropdown Mata Pelajaran -->
                     <div class="select-wrapper">
                         <select class="subject-select-new" id="subjectSelect" onchange="changeSubject(this.value)" disabled>
                             <option value="" disabled selected>Pilih Mata Pelajaran</option>
@@ -881,14 +616,6 @@
                 <div class="toolbar-actions">
                     <button class="btn-ask" onclick="askFromContent()"><span>MINTA JAWABAN</span></button>
                     <button class="btn-save" onclick="showSaveOptions()"><span>SIMPAN</span></button>
-                    
-                    <div class="user-profile" id="userProfile" onclick="toggleUserMenu()" title="Klik untuk logout">
-                        <img src="" alt="User" class="user-avatar" id="userAvatar">
-                        <div class="user-info">
-                            <span class="user-name" id="userName">User</span>
-                            <span class="user-email" id="userEmail">email@example.com</span>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -916,7 +643,9 @@
                         <div class="canvas-question-header">
                             <span>🎨 Gambar Pertanyaan</span>
                             
+                            <!-- Toolbar dengan Dropdown -->
                             <div class="canvas-toolbar">
+                                <!-- Dropdown: Gambar -->
                                 <div class="tool-dropdown" id="drawDropdown">
                                     <button class="tool-dropdown-btn" onclick="toggleDropdown('drawDropdown')">
                                         <span class="icon">✏️</span>
@@ -939,6 +668,7 @@
                                     </div>
                                 </div>
 
+                                <!-- Dropdown: Bentuk -->
                                 <div class="tool-dropdown" id="shapeDropdown">
                                     <button class="tool-dropdown-btn" onclick="toggleDropdown('shapeDropdown')">
                                         <span class="icon">▭</span>
@@ -975,6 +705,7 @@
                                     </div>
                                 </div>
 
+                                <!-- Dropdown: Teks -->
                                 <div class="tool-dropdown" id="textDropdown">
                                     <button class="tool-dropdown-btn" onclick="toggleDropdown('textDropdown')">
                                         <span class="icon" style="font-weight:800;">T</span>
@@ -993,6 +724,7 @@
                                     </div>
                                 </div>
 
+                                <!-- Utility Buttons -->
                                 <div class="toolbar-utilities">
                                     <button class="tool-btn" title="Penghapus" onclick="selectTool('eraser', 'Hapus', '🧹')">
                                         🧹
@@ -1010,6 +742,7 @@
                         <div class="canvas-container">
                             <canvas id="drawingCanvas"></canvas>
                             
+                            <!-- Text Input Overlay -->
                             <div class="text-input-overlay" id="textInputOverlay">
                                 <input type="text" id="canvasTextInput" placeholder="Ketik teks di sini..." maxlength="100">
                                 <div class="text-actions">
@@ -1065,274 +798,38 @@
     </div>
 
     <script>
-        // ==================== FIREBASE CONFIGURATION ====================
-        // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBEjlBaQNM2lAkiHuLRFgdefS6MKI-BqZw",
-    authDomain: "robo-teacher-ai.firebaseapp.com",
-    projectId: "robo-teacher-ai",
-    storageBucket: "robo-teacher-ai.firebasestorage.app",
-    messagingSenderId: "468523004794",
-    appId: "1:468523004794:web:38b6fc9c295d53b189dcc3",
-    measurementId: "G-NBX641YQ04"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        // Kuota Configuration
-        const MAX_QUOTA = 2000; // Maksimal 2000 pertanyaan per bulan
-        
-        // Global State
-        let currentUserData = null;
-        let currentQuota = 0;
-        let currentPeriod = null;
-
-        // Auth State Observer
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                await initializeUser(user);
-                showApp(user);
-            } else {
-                showLogin();
+        // === DATA MATA PELAJARAN PER JENJANG ===
+        const SUBJECTS_DATA = {
+            // SD (Kelas 1-6)
+            'sd': {
+                '1': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Seni dan Budaya', 'PJOK', 'Bahasa Inggris'],
+                '2': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Seni dan Budaya', 'PJOK', 'Bahasa Inggris'],
+                '3': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam', 'Seni dan Budaya', 'PJOK', 'Bahasa Inggris'],
+                '4': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam', 'Ilmu Pengetahuan Sosial', 'Seni dan Budaya', 'PJOK', 'Bahasa Inggris'],
+                '5': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam', 'Ilmu Pengetahuan Sosial', 'Seni dan Budaya', 'PJOK', 'Bahasa Inggris'],
+                '6': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam', 'Ilmu Pengetahuan Sosial', 'Seni dan Budaya', 'PJOK', 'Bahasa Inggris']
+            },
+            // SMP (Kelas 7-9)
+            'smp': {
+                '7': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam', 'Ilmu Pengetahuan Sosial', 'Bahasa Inggris', 'Seni Budaya', 'PJOK', 'Informatika'],
+                '8': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam', 'Ilmu Pengetahuan Sosial', 'Bahasa Inggris', 'Seni Budaya', 'PJOK', 'Informatika'],
+                '9': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam', 'Ilmu Pengetahuan Sosial', 'Bahasa Inggris', 'Seni Budaya', 'PJOK', 'Informatika']
+            },
+            // SMA (Kelas 10-12)
+            'sma': {
+                '10': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika Wajib', 'Matematika Peminatan', 'Fisika', 'Kimia', 'Biologi', 'Ekonomi', 'Geografi', 'Sosiologi', 'Sejarah', 'Bahasa Inggris', 'Seni Budaya', 'PJOK', 'Informatika'],
+                '11': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika Wajib', 'Matematika Peminatan', 'Fisika', 'Kimia', 'Biologi', 'Ekonomi', 'Geografi', 'Sosiologi', 'Sejarah', 'Bahasa Inggris', 'Seni Budaya', 'PJOK', 'Informatika'],
+                '12': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika Wajib', 'Matematika Peminatan', 'Fisika', 'Kimia', 'Biologi', 'Ekonomi', 'Geografi', 'Sosiologi', 'Sejarah', 'Bahasa Inggris', 'Seni Budaya', 'PJOK', 'Informatika']
             }
-        });
+        };
 
-        // ==================== USER MANAGEMENT ====================
-        async function initializeUser(user) {
-            const userRef = db.collection('users').doc(user.uid);
-            const userDoc = await userRef.get();
-            
-            const now = new Date();
-            const currentPeriodStart = getPeriodStart(now);
-            const currentPeriodEnd = getPeriodEnd(now);
-            
-            if (!userDoc.exists) {
-                // User baru - buat dokumen baru
-                currentUserData = {
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: user.displayName || 'Tamu',
-                    photoURL: user.photoURL || '',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    quota: {
-                        used: 0,
-                        max: MAX_QUOTA,
-                        periodStart: currentPeriodStart,
-                        periodEnd: currentPeriodEnd,
-                        lastReset: now
-                    },
-                    isGuest: user.isAnonymous || false
-                };
-                await userRef.set(currentUserData);
-                currentQuota = MAX_QUOTA;
-            } else {
-                // User existing - cek periode
-                const data = userDoc.data();
-                const savedPeriodEnd = data.quota?.periodEnd?.toDate() || new Date(0);
-                
-                if (now > savedPeriodEnd) {
-                    // Periode baru - reset kuota
-                    currentUserData = {
-                        ...data,
-                        quota: {
-                            used: 0,
-                            max: MAX_QUOTA,
-                            periodStart: currentPeriodStart,
-                            periodEnd: currentPeriodEnd,
-                            lastReset: now
-                        }
-                    };
-                    await userRef.update({
-                        quota: currentUserData.quota
-                    });
-                    currentQuota = MAX_QUOTA;
-                    showToast('🔄', 'KUOTA RESET', 'Kuota bulanan Anda telah direset!');
-                } else {
-                    // Periode sama - gunakan sisa kuota
-                    currentUserData = data;
-                    const used = data.quota?.used || 0;
-                    currentQuota = Math.max(0, MAX_QUOTA - used);
-                }
-            }
-            
-            currentPeriod = {
-                start: currentPeriodStart,
-                end: currentPeriodEnd
-            };
-            
-            updateQuotaUI();
-            enableInputs(currentQuota > 0);
-        }
+        // === STATE ===
+        let currentMode = 'text', currentTool = 'pen', isDrawing = false, recognition = null, canvas, ctx, chatOpen = true, stream = null, currentUpload = null, questionCount = 0, isProcessing = false, apiReady = false;
+        let startX, startY, snapshot = null, textInputX = 0, textInputY = 0;
+        let currentGrade = '';
+        let currentSubject = '';
 
-        function getPeriodStart(date) {
-            // Tanggal 1 bulan ini
-            return new Date(date.getFullYear(), date.getMonth(), 1);
-        }
-
-        function getPeriodEnd(date) {
-            // Tanggal 1 bulan depan (minus 1 ms)
-            return new Date(date.getFullYear(), date.getMonth() + 1, 1, 0, 0, 0, -1);
-        }
-
-        async function incrementQuota() {
-            if (!auth.currentUser) return false;
-            
-            const userRef = db.collection('users').doc(auth.currentUser.uid);
-            
-            try {
-                await db.runTransaction(async (transaction) => {
-                    const userDoc = await transaction.get(userRef);
-                    if (!userDoc.exists) throw new Error("User not found");
-                    
-                    const data = userDoc.data();
-                    const currentUsed = data.quota?.used || 0;
-                    
-                    if (currentUsed >= MAX_QUOTA) {
-                        throw new Error("Quota exceeded");
-                    }
-                    
-                    transaction.update(userRef, {
-                        'quota.used': currentUsed + 1,
-                        'quota.lastUsed': firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                });
-                
-                currentQuota--;
-                updateQuotaUI();
-                return true;
-            } catch (error) {
-                console.error("Quota increment failed:", error);
-                return false;
-            }
-        }
-
-        function updateQuotaUI() {
-            const used = MAX_QUOTA - currentQuota;
-            const percentage = (currentQuota / MAX_QUOTA) * 100;
-            
-            // Update counter
-            document.getElementById('counterValue').textContent = currentQuota;
-            document.getElementById('counterFill').style.width = percentage + '%';
-            
-            // Update periode
-            if (currentPeriod) {
-                const startStr = currentPeriod.start.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-                const endStr = currentPeriod.end.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-                document.getElementById('periodInfo').textContent = `${startStr} - ${endStr}`;
-            }
-            
-            // Update welcome message
-            document.getElementById('welcomeQuota').textContent = `${currentQuota}/${MAX_QUOTA}`;
-            
-            // Warning colors
-            if (currentQuota <= 100) {
-                document.getElementById('counterFill').style.background = 'linear-gradient(90deg, #ef4444, #f87171)';
-                document.getElementById('counterValue').style.color = '#ef4444';
-            } else if (currentQuota <= 500) {
-                document.getElementById('counterFill').style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
-            }
-            
-            // Disable inputs jika kuota habis
-            if (currentQuota <= 0) {
-                enableInputs(false);
-                showQuotaWarning('Kuota pertanyaan bulan ini telah habis! Reset tanggal 1 depan.');
-            }
-        }
-
-        function enableInputs(enabled) {
-            const inputs = ['messageInput', 'voiceBtn', 'btnSend'];
-            inputs.forEach(id => {
-                const el = document.getElementById(id) || document.querySelector(`[onclick="sendMessage()"]`);
-                if (el) {
-                    el.disabled = !enabled;
-                    el.style.opacity = enabled ? '1' : '0.5';
-                    el.style.cursor = enabled ? 'pointer' : 'not-allowed';
-                }
-            });
-        }
-
-        function showQuotaWarning(message) {
-            document.getElementById('quotaMessage').textContent = message;
-            document.getElementById('quotaWarning').classList.add('show');
-            setTimeout(() => {
-                document.getElementById('quotaWarning').classList.remove('show');
-            }, 5000);
-        }
-
-        // ==================== AUTH FUNCTIONS ====================
-        function signInWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider)
-                .then((result) => {
-                    showToast('✓', 'LOGIN BERHASIL', `Selamat datang, ${result.user.displayName}!`);
-                })
-                .catch((error) => {
-                    showToast('✗', 'LOGIN GAGAL', error.message);
-                });
-        }
-
-        function signInAsGuest() {
-            auth.signInAnonymously()
-                .then(() => {
-                    showToast('✓', 'MODE TAMU', 'Kuota terbatas 50 pertanyaan/bulan untuk tamu');
-                })
-                .catch((error) => {
-                    showToast('✗', 'ERROR', error.message);
-                });
-        }
-
-        function signOut() {
-            auth.signOut()
-                .then(() => {
-                    currentUserData = null;
-                    currentQuota = 0;
-                    showLogin();
-                    showToast('✓', 'LOGOUT', 'Anda telah keluar');
-                })
-                .catch((error) => {
-                    showToast('✗', 'ERROR', error.message);
-                });
-        }
-
-        function toggleUserMenu() {
-            if (confirm('Apakah Anda ingin keluar?')) {
-                signOut();
-            }
-        }
-
-        // ==================== UI FUNCTIONS ====================
-        function showLogin() {
-            document.getElementById('loginOverlay').classList.remove('hidden');
-            document.getElementById('appContainer').style.display = 'none';
-        }
-
-        function showApp(user) {
-            document.getElementById('loginOverlay').classList.add('hidden');
-            document.getElementById('appContainer').style.display = 'flex';
-            
-            document.getElementById('userName').textContent = user.displayName || 'Tamu';
-            document.getElementById('userEmail').textContent = user.email || 'Mode Tamu';
-            document.getElementById('userAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?name=Guest&background=f97316&color=fff';
-            
-            initApp();
-        }
-
-        // ==================== APP INITIALIZATION ====================
-        function initApp() {
+        document.addEventListener('DOMContentLoaded', () => { 
             initCanvas(); 
             initVoice(); 
             testAPIConnection(); 
@@ -1348,45 +845,56 @@
             checkResponsive(); 
             window.addEventListener('resize', checkResponsive);
             
+            // Close dropdowns when clicking outside
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('.tool-dropdown')) {
                     closeAllDropdowns();
                 }
             });
             
+            // Enter key for text input
             document.getElementById('canvasTextInput').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') confirmTextInput();
             });
+        });
+
+        // === PERUBAHAN KELAS & MATA PELAJARAN ===
+        function changeGrade(grade) {
+            currentGrade = grade;
+            const subjectSelect = document.getElementById('subjectSelect');
+            
+            // Enable subject select
+            subjectSelect.disabled = false;
+            
+            // Clear current options
+            subjectSelect.innerHTML = '<option value="" disabled selected>Pilih Mata Pelajaran</option>';
+            
+            // Determine jenjang
+            let jenjang = '';
+            if (grade >= 1 && grade <= 6) jenjang = 'sd';
+            else if (grade >= 7 && grade <= 9) jenjang = 'smp';
+            else if (grade >= 10 && grade <= 12) jenjang = 'sma';
+            
+            // Get subjects for this grade
+            const subjects = SUBJECTS_DATA[jenjang][grade] || [];
+            
+            // Add subjects to dropdown
+            subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = `${jenjang}-${grade}-${subject.toLowerCase().replace(/\s+/g, '-')}`;
+                option.textContent = subject;
+                subjectSelect.appendChild(option);
+            });
+            
+            showToast('🎓', 'KELAS DIPILIH', `Kelas ${grade} ${jenjang.toUpperCase()}`);
         }
 
-        // ==================== DATA & STATE ====================
-        const SUBJECTS_DATA = {
-            'sd': {
-                '1': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Seni dan Budaya', 'PJOK', 'Bahasa Inggris'],
-                '2': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Seni dan Budaya', 'PJOK', 'Bahasa Inggris'],
-                '3': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam', 'Seni dan Budaya', 'PJOK', 'Bahasa Inggris'],
-                '4': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam', 'Ilmu Pengetahuan Sosial', 'Seni dan Budaya', 'PJOK', 'Bahasa Inggris'],
-                '5': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam', 'Ilmu Pengetahuan Sosial', 'Seni dan Budaya', 'PJOK', 'Bahasa Inggris'],
-                '6': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam', 'Ilmu Pengetahuan Sosial', 'Seni dan Budaya', 'PJOK', 'Bahasa Inggris']
-            },
-            'smp': {
-                '7': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam', 'Ilmu Pengetahuan Sosial', 'Bahasa Inggris', 'Seni Budaya', 'PJOK', 'Informatika'],
-                '8': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam', 'Ilmu Pengetahuan Sosial', 'Bahasa Inggris', 'Seni Budaya', 'PJOK', 'Informatika'],
-                '9': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam', 'Ilmu Pengetahuan Sosial', 'Bahasa Inggris', 'Seni Budaya', 'PJOK', 'Informatika']
-            },
-            'sma': {
-                '10': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika Wajib', 'Matematika Peminatan', 'Fisika', 'Kimia', 'Biologi', 'Ekonomi', 'Geografi', 'Sosiologi', 'Sejarah', 'Bahasa Inggris', 'Seni Budaya', 'PJOK', 'Informatika'],
-                '11': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika Wajib', 'Matematika Peminatan', 'Fisika', 'Kimia', 'Biologi', 'Ekonomi', 'Geografi', 'Sosiologi', 'Sejarah', 'Bahasa Inggris', 'Seni Budaya', 'PJOK', 'Informatika'],
-                '12': ['Pendidikan Agama', 'Pendidikan Pancasila', 'Bahasa Indonesia', 'Matematika Wajib', 'Matematika Peminatan', 'Fisika', 'Kimia', 'Biologi', 'Ekonomi', 'Geografi', 'Sosiologi', 'Sejarah', 'Bahasa Inggris', 'Seni Budaya', 'PJOK', 'Informatika']
-            }
-        };
+        function changeSubject(subjectValue) {
+            currentSubject = subjectValue;
+            const subjectName = document.getElementById('subjectSelect').options[document.getElementById('subjectSelect').selectedIndex].text;
+            showToast('📚', 'MAPEL DIPILIH', subjectName);
+        }
 
-        let currentMode = 'text', currentTool = 'pen', isDrawing = false, recognition = null, canvas, ctx, chatOpen = true, stream = null, currentUpload = null, isProcessing = false, apiReady = false;
-        let startX, startY, snapshot = null, textInputX = 0, textInputY = 0;
-        let currentGrade = '';
-        let currentSubject = '';
-
-        // ==================== API FUNCTIONS ====================
         async function testAPIConnection() {
             updateApiStatus('warning', 'Cek koneksi server...');
             try {
@@ -1419,22 +927,9 @@
             }
             if(isProcessing) return;
             
-            // Cek kuota dulu
-            if (currentQuota <= 0) {
-                showQuotaWarning('Kuota Anda telah habis!');
-                return;
-            }
-            
             const input = document.getElementById('messageInput'); 
             const text = input.value.trim();
             if(!text && !currentUpload) return;
-            
-            // Increment kuota (async, tapi kita lanjutkan)
-            const quotaSuccess = await incrementQuota();
-            if (!quotaSuccess) {
-                showQuotaWarning('Gagal mengurangi kuota. Silakan refresh halaman.');
-                return;
-            }
             
             isProcessing = true; 
             addMessage(text, 'user'); 
@@ -1442,26 +937,21 @@
             showTyping();
             
             try {
-                const user = auth.currentUser;
-                const idToken = user ? await user.getIdToken() : null;
-                
                 const res = await fetch('/api/chat', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': idToken ? `Bearer ${idToken}` : ''
-                    },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ 
                         message: text, 
                         grade: currentGrade,
                         subject: currentSubject,
-                        image: currentUpload,
-                        userId: user ? user.uid : null
+                        image: currentUpload 
                     })
                 });
                 const data = await res.json();
                 if(data.error) throw new Error(data.error);
                 addMessage(data.reply, 'bot');
+                questionCount++; 
+                updateCounterUI();
             } catch(err) { 
                 addMessage("Error: " + err.message, 'bot'); 
             } finally { 
@@ -1475,12 +965,6 @@
             if(!apiReady) return; 
             if(isProcessing) return;
             
-            // Cek kuota
-            if (currentQuota <= 0) {
-                showQuotaWarning('Kuota Anda telah habis!');
-                return;
-            }
-            
             let q = ''; 
             let d = null;
             
@@ -1492,34 +976,20 @@
                 q = 'Jelaskan gambar ini'; 
             }
             
-            // Increment kuota
-            const quotaSuccess = await incrementQuota();
-            if (!quotaSuccess) {
-                showQuotaWarning('Gagal mengurangi kuota.');
-                return;
-            }
-            
             isProcessing = true; 
             if(!chatOpen) toggleChat(); 
             addMessage(q, 'user', d); 
             showTyping();
             
             try {
-                const user = auth.currentUser;
-                const idToken = user ? await user.getIdToken() : null;
-                
                 const res = await fetch('/api/chat', {
                     method: 'POST', 
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': idToken ? `Bearer ${idToken}` : ''
-                    },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ 
                         message: q, 
                         grade: currentGrade,
                         subject: currentSubject, 
-                        image: d,
-                        userId: user ? user.uid : null
+                        image: d 
                     })
                 });
                 const data = await res.json();
@@ -1531,41 +1001,15 @@
                 } else {
                     document.getElementById('canvasAnswerArea').innerHTML = data.reply.replace(/\n/g, '<br>');
                 }
+                
+                questionCount++; 
+                updateCounterUI();
             } catch(err) { 
                 addMessage("Error: " + err.message, 'bot'); 
             } finally { 
                 isProcessing = false; 
                 hideTyping(); 
             }
-        }
-
-        // ==================== UI FUNCTIONS ====================
-        function changeGrade(grade) {
-            currentGrade = grade;
-            const subjectSelect = document.getElementById('subjectSelect');
-            subjectSelect.disabled = false;
-            subjectSelect.innerHTML = '<option value="" disabled selected>Pilih Mata Pelajaran</option>';
-            
-            let jenjang = '';
-            if (grade >= 1 && grade <= 6) jenjang = 'sd';
-            else if (grade >= 7 && grade <= 9) jenjang = 'smp';
-            else if (grade >= 10 && grade <= 12) jenjang = 'sma';
-            
-            const subjects = SUBJECTS_DATA[jenjang][grade] || [];
-            subjects.forEach(subject => {
-                const option = document.createElement('option');
-                option.value = `${jenjang}-${grade}-${subject.toLowerCase().replace(/\s+/g, '-')}`;
-                option.textContent = subject;
-                subjectSelect.appendChild(option);
-            });
-            
-            showToast('🎓', 'KELAS DIPILIH', `Kelas ${grade} ${jenjang.toUpperCase()}`);
-        }
-
-        function changeSubject(subjectValue) {
-            currentSubject = subjectValue;
-            const subjectName = document.getElementById('subjectSelect').options[document.getElementById('subjectSelect').selectedIndex].text;
-            showToast('📚', 'MAPEL DIPILIH', subjectName);
         }
 
         function clearQuestionText() {
@@ -1609,6 +1053,25 @@
                 e.preventDefault(); 
                 sendMessage(); 
             } 
+        }
+        
+        function updateCounterUI() {
+            const maxLimit = 2000;
+            const warningLimit = maxLimit * 0.95;
+            const percentage = Math.min((questionCount / maxLimit) * 100, 100);
+            const fillElement = document.getElementById('counterFill');
+            const countElement = document.getElementById('counterValue');
+            
+            countElement.textContent = questionCount;
+            fillElement.style.width = percentage + '%';
+            
+            if (questionCount >= warningLimit) {
+                fillElement.style.background = 'linear-gradient(90deg, #ef4444, #f87171)';
+                countElement.style.color = '#ef4444';
+            } else {
+                fillElement.style.background = 'linear-gradient(90deg, var(--primary), #fb923c)';
+                countElement.style.color = 'var(--primary)';
+            }
         }
         
         function toggleChat() { 
@@ -1695,12 +1158,16 @@
             } 
         }
         
-        // ==================== CANVAS FUNCTIONS ====================
+        // === DROPDOWN TOOLBAR FUNCTIONS ===
         function toggleDropdown(dropdownId) {
             const dropdown = document.getElementById(dropdownId);
             const isOpen = dropdown.classList.contains('open');
+            
             closeAllDropdowns();
-            if (!isOpen) dropdown.classList.add('open');
+            
+            if (!isOpen) {
+                dropdown.classList.add('open');
+            }
         }
         
         function closeAllDropdowns() {
@@ -1710,6 +1177,7 @@
         function selectTool(tool, label, icon) {
             currentTool = tool;
             
+            // Update UI berdasarkan kategori tool
             if (tool === 'pen' || tool === 'line' || tool === 'curve') {
                 document.getElementById('drawLabel').textContent = label;
                 document.querySelector('#drawDropdown .icon').textContent = icon;
@@ -1722,6 +1190,7 @@
             
             closeAllDropdowns();
             
+            // Update cursor
             if (tool === 'text' || tool === 'text-box') {
                 canvas.style.cursor = 'text';
                 showToast('T', 'MODE TEKS', 'Klik di kanvas untuk menambah teks');
@@ -1742,12 +1211,15 @@
             });
         }
         
+        // === TEXT INPUT FUNCTIONS ===
         function showTextInput(x, y) {
             const overlay = document.getElementById('textInputOverlay');
             const input = document.getElementById('canvasTextInput');
+            
             textInputX = x;
             textInputY = y;
             
+            // Position overlay near click but keep in bounds
             const container = document.querySelector('.canvas-container');
             const rect = container.getBoundingClientRect();
             
@@ -1767,7 +1239,11 @@
         function confirmTextInput() {
             const input = document.getElementById('canvasTextInput');
             const text = input.value.trim();
-            if (text) drawTextOnCanvas(text, textInputX, textInputY);
+            
+            if (text) {
+                drawTextOnCanvas(text, textInputX, textInputY);
+            }
+            
             hideTextInput();
         }
         
@@ -1797,24 +1273,29 @@
             
             ctx.fillStyle = document.getElementById('colorPicker').value;
             ctx.fillText(text, x, y);
+            
             showToast('✓', 'TEKS DITAMBAH', `"${text.substring(0, 20)}${text.length > 20 ? '...' : ''}"`);
         }
         
+        // === CANVAS FUNCTIONS ===
         function initCanvas() { 
             canvas = document.getElementById('drawingCanvas'); 
             ctx = canvas.getContext('2d'); 
             resizeCanvas(); 
             window.addEventListener('resize', resizeCanvas); 
             
+            // Mouse events
             canvas.addEventListener('mousedown', startDraw); 
             canvas.addEventListener('mousemove', draw); 
             canvas.addEventListener('mouseup', stopDraw); 
             canvas.addEventListener('mouseout', stopDraw);
             
+            // Touch events
             canvas.addEventListener('touchstart', handleTouchStart, {passive: false}); 
             canvas.addEventListener('touchmove', handleTouchMove, {passive: false}); 
             canvas.addEventListener('touchend', stopDraw);
             
+            // Set default styles
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
         }
@@ -1867,6 +1348,7 @@
             startX = c.x;
             startY = c.y;
             
+            // Handle text tool
             if (currentTool === 'text' || currentTool === 'text-box') {
                 showTextInput(c.x, c.y);
                 return;
@@ -1907,20 +1389,24 @@
                     ctx.lineTo(x2, y2);
                     ctx.stroke();
                     break;
+                    
                 case 'rect':
                     ctx.strokeRect(x1, y1, x2-x1, y2-y1);
                     break;
+                    
                 case 'square':
                     const size = Math.max(Math.abs(x2-x1), Math.abs(y2-y1));
                     const sx = x2 > x1 ? x1 : x1 - size;
                     const sy = y2 > y1 ? y1 : y1 - size;
                     ctx.strokeRect(sx, sy, size, size);
                     break;
+                    
                 case 'circle':
                     const radius = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
                     ctx.arc(x1, y1, radius, 0, 2 * Math.PI);
                     ctx.stroke();
                     break;
+                    
                 case 'triangle':
                     const side = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
                     const height = (Math.sqrt(3)/2) * side;
@@ -1930,6 +1416,7 @@
                     ctx.closePath();
                     ctx.stroke();
                     break;
+                    
                 case 'triangle-right':
                     ctx.moveTo(x1, y1);
                     ctx.lineTo(x2, y1);
@@ -1937,12 +1424,14 @@
                     ctx.closePath();
                     ctx.stroke();
                     break;
+                    
                 case 'arrow':
                     const angle = Math.atan2(y2-y1, x2-x1);
                     const headLen = 15;
                     ctx.moveTo(x1, y1);
                     ctx.lineTo(x2, y2);
                     ctx.stroke();
+                    
                     ctx.beginPath();
                     ctx.moveTo(x2, y2);
                     ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI/6), y2 - headLen * Math.sin(angle - Math.PI/6));
@@ -1959,7 +1448,9 @@
             ctx.beginPath(); 
         }
         
-        function setColor(c) {}
+        function setColor(c) { 
+            // Color updated via picker
+        }
         
         function clearCanvas() { 
             if (confirm('Yakin ingin menghapus semua gambar?')) {
@@ -2002,6 +1493,7 @@
             const {jsPDF} = window.jspdf; 
             const p = new jsPDF();
             
+            // Header
             p.setFillColor(249, 115, 22);
             p.rect(0, 0, 210, 30, 'F');
             p.setTextColor(255, 255, 255);
